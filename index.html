@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DarkChat AI | محادثة مظلمة مع الذكاء الاصطناعي</title>
+    <!-- Font Awesome للأيقونات -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+    <!-- Animate.css للتأثيرات الحركية -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        :root {
+            --dark-bg: #121212;
+            --darker-bg: #0a0a0a;
+            --light-text: #e0e0e0;
+            --primary-color: #00ffcc;
+            --secondary-color: #00ccff;
+            --glass-bg: rgba(20, 20, 20, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark-bg);
+            color: var(--light-text);
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .app-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--darker-bg), var(--dark-bg));
+        }
+
+        .chat-header {
+            width: 100%;
+            max-width: 800px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chat-header h1 {
+            font-size: 32px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
+        }
+
+        .chat-header p {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            height: 70vh;
+            background: var(--glass-bg);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 10px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 15px;
+            word-wrap: break-word;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--dark-bg);
+            border-bottom-right-radius: 0;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--light-text);
+            border-bottom-left-radius: 0;
+        }
+
+        .message-time {
+            font-size: 10px;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .chat-input-container {
+            display: flex;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid var(--glass-border);
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light-text);
+            font-size: 16px;
+            outline: none;
+        }
+
+        .chat-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .send-button {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            border: none;
+            color: white;
+            font-size: 20px;
+            margin-left: 10px;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .send-button:hover {
+            transform: scale(1.1);
+            background: var(--secondary-color);
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: var(--glass-bg);
+            border-radius: 15px;
+            border: 1px solid var(--glass-border);
+            max-width: 80%;
+            align-self: flex-start;
+            display: none;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            animation: typingAnimation 1.5s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.6s;
+        }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chat-settings {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .setting-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--light-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .setting-button:hover {
+            background: rgba(0, 255, 204, 0.2);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .chat-header h1 {
+                font-size: 24px;
+            }
+
+            .chat-container {
+                height: 80vh;
+                border-radius: 10px;
+            }
+
+            .chat-input-container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="chat-header animate__animated animate__fadeInDown">
+            <h1>DarkChat AI</h1>
+            <p>محادثة مظلمة مع الذكاء الاصطناعي</p>
+        </div>
+
+        <div class="chat-container animate__animated animate__fadeIn">
+            <div class="chat-settings">
+                <button class="setting-button" title="مسح المحادثة">
+                    <i class="fas fa-trash"></i>
+                </button>
+                <button class="setting-button" title="الإعدادات">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <!-- الرسائل ستظهر هنا -->
+                <div class="message ai-message animate__animated animate__fadeIn">
+                    مرحبا! أنا DarkChat AI، كيف يمكنني مساعدتك اليوم؟
+                    <div class="message-time">الآن</div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+
+            <div class="chat-input-container">
+                <input type="text" class="chat-input" id="chatInput" placeholder="اكتب رسالتك هنا..." autocomplete="off">
+                <button class="send-button" id="sendButton">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // متغيرات عالمية
+        const chatMessages = document.getElementById("chatMessages");
+        const chatInput = document.getElementById("chatInput");
+        const sendButton = document.getElementById("sendButton");
+        const typingIndicator = document.getElementById("typingIndicator");
+
+        // رسائل افتراضية للـ AI
+        const aiResponses = [
+            { question: "مرحبا", response: "مرحبا! كيف يمكنني مساعدتك اليوم؟" },
+            { question: "كيف حالك", response: "أنا بخير، شكرا للسؤال! كيف يمكنني مساعدتك؟" },
+            { question: "ما اسمك", response: "أنا DarkChat AI، مساعدك الذكي في العالم المظلم!" },
+            { question: "ما هي مهامك", response: "يمكنني الإجابة على أسئلتك، تقديم نصائح، مساعدتك في حل المشكلات، والتحدث معك عن أي موضوع!" },
+            { question: "شكرا", response: "عفواً! أنا هنا دائماً لمساعدتك. 😊" },
+            { question: "وداعا", response: "وداعاً! اتمنى أن أراك قريباً. 👋" },
+            { question: "ما هو الوقت", response: "أنا لا أعرف الوقت الحالي، ولكن يمكنك التحقق من ساعتك! ⏰" },
+            { question: "ما هو الطقس", response: "أنا لا أستطيع الوصول إلى بيانات الطقس، ولكن يمكنك التحقق من تطبيق الطقس الخاص بك! ☁️" },
+        ];
+
+        // إرسال رسالة
+        function sendMessage() {
+            const messageText = chatInput.value.trim();
+            if (!messageText) return;
+
+            // إضافة رسالة المستخدم
+            addMessage(messageText, "user-message");
+            chatInput.value = "";
+
+            // عرض مؤشر الكتابة
+            typingIndicator.style.display = "flex";
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // محاكاة رد الذكاء الاصطناعي
+            setTimeout(() => {
+                typingIndicator.style.display = "none";
+
+                // البحث عن رد مناسب
+                let response = "أنا لا أفهم سؤالك، هل يمكنك إعادة صياغته؟";
+                for (const pair of aiResponses) {
+                    if (messageText.toLowerCase().includes(pair.question.toLowerCase())) {
+                        response = pair.response;
+                        break;
+                    }
+                }
+
+                // إضافة رد الذكاء الاصطناعي
+                addMessage(response, "ai-message");
+            }, 1000);
+        }
+
+        // إضافة رسالة إلى المحادثة
+        function addMessage(text, className) {
+            const messageDiv = document.createElement("div");
+            messageDiv.className = `message ${className} animate__animated animate__fadeIn`;
+
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            messageDiv.innerHTML = `
+                ${text}
+                <div class="message-time">${time}</div>
+            `;
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // إرسال الرسالة عند النقر على الزر
+        sendButton.addEventListener("click", sendMessage);
+
+        // إرسال الرسالة عند الضغط على Enter
+        chatInput.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        });
+
+        // مسح المحادثة
+        document.querySelector(".setting-button:nth-child(1)").addEventListener("click", function() {
+            if (confirm("هل أنت متأكد من أنك تريد مسح المحادثة؟")) {
+                chatMessages.innerHTML = `
+                    <div class="message ai-message animate__animated animate__fadeIn">
+                        مرحبا! أنا DarkChat AI، كيف يمكنني مساعدتك اليوم؟
+                        <div class="message-time">الآن</div>
+                    </div>
+                `;
+            }
+        });
+
+        // عرض الإعدادات
+        document.querySelector(".setting-button:nth-child(2)").addEventListener("click", function() {
+            alert("الإعدادات: هذا الإصدار الأولي من DarkChat AI. ستتم إضافة المزيد من الميزات قريباً!");
+        });
+    </script>
+</body>
+</html>
