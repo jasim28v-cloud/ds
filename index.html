@@ -3,226 +3,211 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VØID-X | NEURAL SINGULARITY</title>
+    <title>VØID-X | ULTRA IONIC GENERATION</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@800&family=Outfit:wght@100;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Tajawal:wght@300;700&display=swap');
 
         :root {
-            --neural-glow: #00ffcc;
-            --deep-void: #000205;
-            --plasma-gradient: linear-gradient(135deg, #00f3ff 0%, #7a00ff 100%);
+            --ion-core: #00f3ff;
+            --ion-glow: rgba(0, 243, 255, 0.5);
+            --ultra-dark: #020205;
         }
 
-        body, html {
-            margin: 0; padding: 0;
-            background: var(--deep-void);
-            color: #fff;
-            font-family: 'Outfit', sans-serif;
+        body {
+            margin: 0; background: var(--ultra-dark);
+            color: white; font-family: 'Tajawal', sans-serif;
             overflow: hidden;
         }
 
-        #singularity-canvas {
-            position: fixed; top: 0; left: 0; z-index: -1;
-            filter: contrast(120%) brightness(110%);
+        #ion-canvas { position: fixed; top: 0; left: 0; z-index: -1; filter: blur(2px); }
+
+        .ultra-glass {
+            background: rgba(255, 255, 255, 0.015);
+            backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
 
-        /* حاوية النبض العصبي */
-        .neural-card {
-            background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(80px) saturate(250%) contrast(150%);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 80px;
+        .ionic-node {
             position: relative;
-            transform-style: preserve-3d;
-            transition: all 1s cubic-bezier(0.075, 0.82, 0.165, 1);
+            transition: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        .neural-card::before {
-            content: ''; position: absolute; inset: -1px;
-            border-radius: 80px; padding: 2px;
-            background: var(--plasma-gradient);
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor; mask-composite: exclude;
-            opacity: 0.3;
+        .ionic-node:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--ion-core);
+            box-shadow: 0 0 30px var(--ion-glow);
         }
 
-        .neural-card:hover {
-            transform: translateY(-20px) rotateY(5deg) rotateX(5deg);
-            background: rgba(255, 255, 255, 0.03);
-            box-shadow: 0 50px 100px rgba(0, 243, 255, 0.15);
-        }
-
-        .feed-container {
+        .video-stream {
             height: 100vh;
             scroll-snap-type: y mandatory;
             overflow-y: scroll;
             scrollbar-width: none;
         }
-        .feed-container::-webkit-scrollbar { display: none; }
+        .video-stream::-webkit-scrollbar { display: none; }
 
-        .snap-unit {
-            height: 100vh; scroll-snap-align: start;
-            display: flex; align-items: center; justify-content: center;
+        .stream-unit {
+            height: 100vh;
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1000px;
         }
 
-        /* أزرار التفاعل المغناطيسية */
-        .magnetic-btn {
-            width: 80px; height: 80px;
-            border-radius: 30px;
-            background: rgba(255,255,255,0.02);
+        .floating-actions {
+            position: absolute;
+            right: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .ion-sphere {
+            width: 65px; height: 65px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.1);
             display: flex; align-items: center; justify-content: center;
             cursor: pointer;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            backdrop-filter: blur(20px);
+            transition: 0.4s;
+            backdrop-filter: blur(10px);
         }
 
-        .magnetic-btn:hover {
-            background: var(--plasma-gradient);
-            box-shadow: 0 0 40px var(--neural-glow);
-            transform: scale(1.2) translateY(-5px);
-            border: none;
-        }
-
-        /* واجهة الرفع المتطورة */
-        .singularity-trigger {
-            font-family: 'Syncopate', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 10px;
-            font-size: 0.8rem;
-            padding: 20px 50px;
-            border-radius: 20px;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(0, 255, 204, 0.3);
-            position: relative;
-            overflow: hidden;
-            transition: 0.5s;
-        }
-
-        .singularity-trigger:hover {
-            letter-spacing: 15px;
-            background: var(--neural-glow);
+        .ion-sphere:hover {
+            background: var(--ion-core);
             color: black;
-            box-shadow: 0 0 50px var(--neural-glow);
+            border-radius: 50%;
+            transform: rotate(90deg);
         }
+
+        .uploader-btn {
+            background: linear-gradient(90deg, #00f3ff, #7a00ff);
+            padding: 1px;
+            border-radius: 15px;
+            cursor: pointer;
+        }
+
+        .uploader-inner {
+            background: var(--ultra-dark);
+            padding: 12px 30px;
+            border-radius: 14px;
+            font-family: 'Syncopate', sans-serif;
+            font-weight: 700;
+            letter-spacing: 2px;
+            transition: 0.3s;
+        }
+
+        .uploader-btn:hover .uploader-inner { background: transparent; color: white; }
     </style>
 </head>
 <body>
 
-    <canvas id="singularity-canvas"></canvas>
+    <canvas id="ion-canvas"></canvas>
 
-    <nav class="fixed top-0 w-full z-50 p-16 flex justify-between items-center pointer-events-none">
-        <div class="pointer-events-auto">
-            <h1 class="text-5xl font-black tracking-tighter" style="font-family: 'Syncopate';">VØID</h1>
-            <p class="text-[10px] tracking-[15px] text-cyan-400 mt-2 opacity-50">SINGULARITY_V3</p>
+    <nav class="fixed top-0 w-full z-50 p-10 flex justify-between items-center">
+        <div class="text-3xl font-bold tracking-tighter" style="font-family: 'Syncopate';">
+            VØID<span class="text-[var(--ion-core)]">.ULTRA</span>
         </div>
         
-        <button class="singularity-trigger pointer-events-auto" id="launchPulse">
-            Initialize_Upload
-        </button>
+        <div class="uploader-btn" id="ionUpload">
+            <div class="uploader-inner">IONIC_UPLOAD</div>
+        </div>
     </nav>
 
-    <main class="feed-container" id="singularityFeed">
-        </main>
+    <div class="video-stream" id="ionFeed">
+        </div>
+
+    <div class="fixed bottom-10 left-10 z-50">
+        <div class="ultra-glass p-5 rounded-3xl flex items-center gap-4 ionic-node cursor-pointer" onclick="toggleIonChat()">
+            <div class="w-3 h-3 bg-[var(--ion-core)] rounded-full animate-ping"></div>
+            <span class="text-sm font-bold tracking-widest">IONIC_CHAT_SYSTEM</span>
+        </div>
+    </div>
 
     <script>
-        // 1. محرك "النسيج الكوني" (Shader Background)
+        // --- محرك الأيونات الخلفي (Three.js Advanced Particles) ---
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('singularity-canvas'), antialias: true, alpha: true});
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('ion-canvas'), antialias: true, alpha: true});
         renderer.setSize(window.innerWidth, window.innerHeight);
 
-        const pointCount = 5000;
-        const positions = new Float32Array(pointCount * 3);
-        for(let i=0; i<pointCount*3; i++) positions[i] = (Math.random() - 0.5) * 100;
-        const geo = new THREE.BufferGeometry();
-        geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-        const mat = new THREE.PointsMaterial({size: 0.05, color: 0x00ffcc, transparent: true, opacity: 0.4});
-        const points = new THREE.Points(geo, mat);
-        scene.add(points);
-        camera.position.z = 30;
+        const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
+        const material = new THREE.PointsMaterial({size: 0.05, color: 0x00f3ff});
+        const particles = new THREE.Points(geometry, material);
+        scene.add(particles);
+        camera.position.z = 15;
 
-        function animate() {
-            requestAnimationFrame(animate);
-            points.rotation.y += 0.001;
-            points.rotation.x += 0.0005;
+        function animateIon() {
+            requestAnimationFrame(animateIon);
+            particles.rotation.y += 0.002;
+            particles.rotation.x += 0.001;
             renderer.render(scene, camera);
         }
-        animate();
+        animateIon();
 
-        // 2. بروتوكول الرفع والربط
-        const CORE_API = {
-            FB: "https://forg-c693e-default-rtdb.firebaseio.com/singularity_v3.json",
-            ADS: [
-                "https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c",
-                "https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e"
-            ]
-        };
+        // --- نظام الرفع والأتمتة ---
+        const FB_DB = "https://forg-c693e-default-rtdb.firebaseio.com/ultra_ions.json";
+        const ADS = [
+            "https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c",
+            "https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e"
+        ];
 
-        const uploader = cloudinary.createUploadWidget({
+        const widget = cloudinary.createUploadWidget({
             cloudName: 'dfscughol',
             uploadPreset: 'update_vk',
-            styles: { palette: { window: '#000', sourceBg: '#000', action: '#00ffcc' } }
+            theme: 'minimal'
         }, (err, res) => {
             if (!err && res.event === "success") {
-                fetch(CORE_API.FB, { method: 'POST', body: JSON.stringify({url: res.info.secure_url, entropy: Math.random()}) })
+                fetch(FB_DB, { method: 'POST', body: JSON.stringify({url: res.info.secure_url, date: Date.now()}) })
                 .then(() => location.reload());
             }
         });
 
-        document.getElementById('launchPulse').onclick = () => uploader.open();
+        document.getElementById('ionUpload').onclick = () => widget.open();
 
-        // 3. بناء تجربة التصفح العصبية
-        async function initSingularity() {
-            const res = await fetch(CORE_API.FB);
+        // --- بناء الخلاصة الأيونية ---
+        async function buildIonFeed() {
+            const res = await fetch(FB_DB);
             const data = await res.json();
-            const feed = document.getElementById('singularityFeed');
+            const feed = document.getElementById('ionFeed');
             
-            for(let key in data) {
+            for(let id in data) {
                 feed.innerHTML += `
-                    <div class="snap-unit">
-                        <div class="w-[450px] h-[800px] neural-card overflow-hidden group">
-                            <video src="${data[key].url}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-1000" loop playsinline></video>
+                    <div class="stream-unit">
+                        <div class="w-[380px] h-[680px] ultra-glass rounded-[50px] relative ionic-node overflow-hidden">
+                            <video src="${data[id].url}" class="w-full h-full object-cover" loop playsinline></video>
                             
-                            <div class="absolute right-8 top-1/2 -translate-y-1/2 flex flex-col gap-10">
-                                <div class="magnetic-btn" onclick="window.open('${CORE_API.ADS[0]}')">
-                                    <span class="text-2xl">⚡</span>
-                                </div>
-                                <div class="magnetic-btn" onclick="window.open('${CORE_API.ADS[1]}')">
-                                    <span class="text-2xl">🔥</span>
-                                </div>
-                                <div class="magnetic-btn" onclick="window.open('${CORE_API.ADS[0]}')">
-                                    <span class="text-2xl">💠</span>
-                                </div>
+                            <div class="floating-actions">
+                                <div class="ion-sphere" onclick="window.open('${ADS[0]}')">⚡</div>
+                                <div class="ion-sphere" onclick="window.open('${ADS[1]}')">💠</div>
+                                <div class="ion-sphere" onclick="window.open('${ADS[0]}')">🔗</div>
                             </div>
 
-                            <div class="absolute bottom-16 left-12">
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                                    <span class="text-[10px] tracking-[5px] uppercase opacity-40">Live_Entropy</span>
-                                </div>
-                                <h2 class="text-3xl font-thin tracking-widest">PULSE_${key.slice(-4)}</h2>
+                            <div class="absolute bottom-10 right-10 left-10">
+                                <div class="h-[2px] w-full bg-white/10 mb-4"><div class="h-full bg-[var(--ion-core)] w-1/3"></div></div>
+                                <p class="text-[10px] opacity-50 uppercase tracking-widest">Core Entity: ${id.slice(-5)}</p>
                             </div>
                         </div>
                     </div>
                 `;
             }
 
-            // محرك الاستجابة الحركية
+            // نظام التشغيل الذكي
             const observer = new IntersectionObserver(entries => {
-                entries.forEach(e => {
-                    const v = e.target.querySelector('video');
-                    if(v) e.isIntersecting ? v.play() : v.pause();
+                entries.forEach(entry => {
+                    const v = entry.target.querySelector('video');
+                    if (v) entry.isIntersecting ? v.play() : v.pause();
                 });
-            }, { threshold: 0.8 });
-            document.querySelectorAll('.snap-unit').forEach(u => observer.observe(u));
+            }, { threshold: 0.7 });
+            document.querySelectorAll('.stream-unit').forEach(unit => observer.observe(unit));
         }
 
-        initSingularity();
+        buildIonFeed();
     </script>
 </body>
 </html>
