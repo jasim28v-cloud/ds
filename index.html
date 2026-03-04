@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHΔDØW | ULTIMATE TITAN</title>
+    <title>SHΔDØW | TRANSPARENT TITAN</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -13,164 +13,246 @@
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Cairo:wght@300;900&display=swap');
         :root { --primary: #ffcc00; --bg: #000; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; width: 100vw; }
+        body, html { background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; width: 100vw; position: fixed; }
 
-        .video-container { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; position: relative; }
+        /* حاوية الفيديوهات */
+        .video-container { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; position: relative; z-index: 1; }
         .video-container::-webkit-scrollbar { display: none; }
         .video-scroll-item { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
         /* العلامة المائية */
-        .watermark { position: absolute; top: 15%; left: 10px; opacity: 0.5; pointer-events: none; z-index: 50; font-family: 'Orbitron'; font-size: 14px; color: rgba(255,255,255,0.4); text-shadow: 1px 1px 2px #000; }
+        .watermark { position: absolute; top: 20%; left: 20px; opacity: 0.3; pointer-events: none; z-index: 50; font-family: 'Orbitron'; font-size: 12px; letter-spacing: 2px; }
 
-        /* واجهة شفافة */
-        .ui-overlay { position: absolute; bottom: 100px; left: 0; right: 0; padding: 20px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); pointer-events: none; z-index: 10; }
+        /* الواجهة العلوية الشفافة */
+        .top-interface { 
+            position: fixed; 
+            top: 0; 
+            width: 100%; 
+            padding: 15px; 
+            z-index: 100; 
+            background: rgba(0, 0, 0, 0.2); /* شفافة جداً */
+            backdrop-filter: blur(8px); 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--primary); font-size: 1.4rem; text-shadow: 0 0 10px rgba(255,204,0,0.5); }
 
-        .side-actions { position: absolute; right: 15px; bottom: 150px; display: flex; flex-direction: column; gap: 20px; z-index: 20; align-items: center; }
-        .icon-circle { width: 54px; height: 54px; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(5px); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; border: 1px solid rgba(255,204,0,0.2); transition: 0.2s; }
-        .icon-circle:active { transform: scale(0.9); border-color: var(--primary); }
+        /* لوحة التحكم (مخفية افتراضياً) */
+        #admin-panel { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.9); 
+            backdrop-filter: blur(20px); 
+            z-index: 2000; 
+            padding: 20px; 
+            overflow-y: auto; 
+        }
 
-        .top-interface { position: fixed; top: 0; width: 100%; padding: 10px; z-index: 100; background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent); }
-        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--primary); font-size: 1.4rem; }
+        /* نافذة الدردشة */
+        #chat-modal { 
+            display: none; 
+            position: fixed; 
+            top: 90px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 85%; 
+            max-height: 300px; 
+            background: rgba(0,0,0,0.6); 
+            backdrop-filter: blur(20px); 
+            z-index: 1000; 
+            border: 1px solid rgba(255, 204, 0, 0.3); 
+            border-radius: 20px; 
+            padding: 15px; 
+        }
 
-        #chat-modal { display: none; position: fixed; top: 80px; left: 50%; transform: translateX(-50%); width: 85%; height: 250px; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); z-index: 1000; border: 1px solid var(--primary); border-radius: 15px; padding: 10px; }
-        .chat-flow { height: 180px; overflow-y: auto; font-size: 11px; }
+        /* الأزرار الجانبية */
+        .side-actions { position: absolute; right: 15px; bottom: 130px; display: flex; flex-direction: column; gap: 18px; z-index: 20; align-items: center; }
+        .icon-circle { 
+            width: 50px; 
+            height: 50px; 
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(10px); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 24px; 
+            border: 1px solid rgba(255,204,0,0.2); 
+        }
 
-        .bottom-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); display: flex; justify-content: space-around; align-items: center; z-index: 100; border-top: 1px solid rgba(255,255,255,0.05); }
-        .nav-icon { font-size: 20px; color: rgba(255,255,255,0.7); }
-        .upload-btn { background: var(--primary); color: #000; width: 45px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        /* الشريط السفلي الشفاف */
+        .bottom-bar { 
+            position: fixed; 
+            bottom: 0; 
+            width: 100%; 
+            height: 65px; 
+            background: rgba(0,0,0,0.3); 
+            backdrop-filter: blur(15px); 
+            display: flex; 
+            justify-content: space-around; 
+            align-items: center; 
+            z-index: 100; 
+            border-top: 1px solid rgba(255,255,255,0.05); 
+        }
+        .nav-icon { font-size: 22px; color: rgba(255,255,255,0.5); transition: 0.3s; }
+        .nav-icon.active { color: var(--primary); }
 
-        /* تأثير القلب عند النقر المزدوج */
-        .heart-animation { position: absolute; color: var(--primary); font-size: 80px; opacity: 0; pointer-events: none; z-index: 100; transform: translate(-50%, -50%) scale(0); animation: heartBeat 0.8s ease-out; }
-        @keyframes heartBeat { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0); } 30% { opacity: 0.9; transform: translate(-50%, -50%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); } }
+        .upload-btn { background: var(--primary); color: #000; width: 45px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+
+        /* تأثير القلب المزدوج */
+        .heart-pop { position: absolute; font-size: 80px; color: var(--primary); pointer-events: none; z-index: 1000; animation: heartFade 0.8s ease-out forwards; }
+        @keyframes heartFade { 0% { opacity:0; transform: scale(0.5); } 50% { opacity:1; transform: scale(1.2); } 100% { opacity:0; transform: scale(1.5); } }
     </style>
 </head>
 <body>
 
     <div class="top-interface flex justify-between items-center">
         <div class="logo">SHΔDØW</div>
-        <div class="text-[10px] opacity-60" id="user-id">---</div>
+        <div class="text-[10px] text-yellow-500 font-bold" id="display-id">---</div>
+    </div>
+
+    <div id="admin-panel">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-xl font-black text-yellow-500">CONTROL CENTER</h1>
+            <i class="fas fa-times text-2xl" onclick="toggleAdmin()"></i>
+        </div>
+        <div id="admin-video-list" class="grid grid-cols-2 gap-4"></div>
     </div>
 
     <div id="chat-modal">
-        <div class="chat-flow" id="chat-content"></div>
-        <div class="flex gap-2 mt-2">
-            <input type="text" id="chat-input" class="flex-1 bg-white/10 rounded-full px-4 text-[11px]" placeholder="اكتب هنا...">
-            <button onclick="sendChat()" class="text-yellow-500"><i class="fas fa-paper-plane"></i></button>
+        <div id="chat-box" class="h-40 overflow-y-auto text-[11px] mb-3"></div>
+        <div class="flex gap-2">
+            <input type="text" id="chat-input" class="flex-1 bg-white/10 rounded-full px-4 text-[11px] h-8" placeholder="رسالة...">
+            <button onclick="sendMsg()" class="text-yellow-500"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
     <div class="video-container" id="feed-container"></div>
 
     <div class="bottom-bar">
-        <i class="fas fa-home nav-icon" onclick="location.reload()"></i>
-        <i class="fas fa-comment nav-icon" onclick="toggleChat()"></i>
-        <div class="upload-btn" id="mega-upload"><i class="fas fa-plus"></i></div>
-        <i class="fas fa-search nav-icon" onclick="openAd()"></i>
+        <i class="fas fa-home nav-icon active" onclick="location.reload()"></i>
+        <i class="fas fa-comments nav-icon" onclick="toggleChat()"></i>
+        <div class="upload-btn" id="btn-upload"><i class="fas fa-plus"></i></div>
+        <i class="fas fa-share-alt nav-icon" onclick="openAd()"></i>
         <i class="fas fa-user-shield nav-icon" onclick="toggleAdmin()"></i>
     </div>
 
     <script>
-        const ADMIN_ID = "GHOST_5NN5M5";
+        // التوثيق: الـ ID يجب أن يبدأ بكلمة GHOST لفتح لوحة التحكم
         const MY_ID = localStorage.getItem('shadow_uid') || 'GHOST_' + Math.random().toString(36).substr(2, 4).toUpperCase();
         localStorage.setItem('shadow_uid', MY_ID);
-        document.getElementById('user-id').innerText = MY_ID;
+        document.getElementById('display-id').innerText = MY_ID;
 
         const firebaseConfig = { databaseURL: "https://project-717e4-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        const AD_LINKS = ["https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e", "https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c"];
-        function openAd() { window.open(AD_LINKS[Math.floor(Math.random()*2)], '_blank'); }
+        // نظام الإعلانات
+        const AD_URL = "https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e";
+        function openAd() { window.open(AD_URL, '_blank'); }
 
+        // نظام الرفع
         const widget = cloudinary.createUploadWidget({ cloudName: "dssk5tabb", uploadPreset: "bjebvo5p" }, (err, res) => {
             if (!err && res.event === "success") {
                 db.ref('videos/').push({ url: res.info.secure_url, sender: MY_ID, likes: 0 });
                 openAd();
             }
         });
-        document.getElementById("mega-upload").onclick = () => widget.open();
+        document.getElementById("btn-upload").onclick = () => widget.open();
 
-        db.ref('videos').on('value', (snapshot) => {
-            const container = document.getElementById('feed-container');
-            const data = snapshot.val();
+        // جلب الفيديوهات
+        db.ref('videos').on('value', (snap) => {
+            const feed = document.getElementById('feed-container');
+            const adminList = document.getElementById('admin-video-list');
+            const data = snap.val();
             if(!data) return;
-            container.innerHTML = '';
+            feed.innerHTML = '';
+            adminList.innerHTML = '';
+
             Object.keys(data).reverse().forEach(id => {
-                const vid = data[id];
-                const section = document.createElement('div');
-                section.className = 'video-scroll-item';
-                section.innerHTML = `
+                const v = data[id];
+                const item = document.createElement('div');
+                item.className = 'video-scroll-item';
+                item.innerHTML = `
                     <div class="watermark">SHΔDØW TITAN</div>
-                    <video loop playsinline src="${vid.url}" id="v-${id}" onclick="handleVideoClick(event, '${id}')"></video>
+                    <video loop playsinline src="${v.url}" onclick="handleTap(event, '${id}')"></video>
                     <div class="side-actions">
-                        <div class="action-btn" onclick="likeVideo('${id}')">
-                            <div class="icon-circle"><i class="fas fa-heart text-white"></i></div>
-                            <span class="text-[10px] mt-1">${vid.likes || 0}</span>
+                        <div class="action-btn" onclick="like('${id}')">
+                            <div class="icon-circle"><i class="fas fa-heart"></i></div>
+                            <span class="text-[10px] mt-1">${v.likes || 0}</span>
                         </div>
                         <div class="action-btn" onclick="openAd()">
-                            <div class="icon-circle"><i class="fas fa-share text-white"></i></div>
-                            <span class="text-[10px] mt-1 text-center">SHΔRE</span>
+                            <div class="icon-circle"><i class="fas fa-share"></i></div>
                         </div>
                     </div>
-                    <div class="ui-overlay">
-                        <div class="text-yellow-500 font-bold text-sm">@${vid.sender}</div>
-                        <div class="text-[11px] opacity-80">نظام تيتان المطور - وضع المشاهدة السري</div>
+                `;
+                feed.appendChild(item);
+
+                // لوحة الإدارة
+                adminList.innerHTML += `
+                    <div class="bg-white/5 p-2 rounded relative">
+                        <video src="${v.url}" class="h-32 w-full object-cover rounded"></video>
+                        <button onclick="deleteVid('${id}')" class="absolute top-2 right-2 bg-red-600 p-2 rounded-full text-[10px]"><i class="fas fa-trash"></i></button>
                     </div>
                 `;
-                container.appendChild(section);
             });
             startObserver();
         });
 
+        // النقر المزدوج والتشغيل
         let lastTap = 0;
-        function handleVideoClick(e, id) {
+        function handleTap(e, id) {
             const now = Date.now();
             if (now - lastTap < 300) {
-                // النقر المزدوج
-                likeVideo(id);
-                showHeartAnimation(e);
+                like(id);
+                const heart = document.createElement('i');
+                heart.className = 'fas fa-heart heart-pop';
+                heart.style.left = e.clientX + 'px';
+                heart.style.top = e.clientY + 'px';
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 800);
             } else {
-                const v = e.target;
-                v.paused ? v.play() : v.pause();
+                e.target.paused ? e.target.play() : e.target.pause();
             }
             lastTap = now;
         }
 
-        function showHeartAnimation(e) {
-            const heart = document.createElement('i');
-            heart.className = 'fas fa-heart heart-animation';
-            heart.style.left = e.clientX + 'px';
-            heart.style.top = e.clientY + 'px';
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 800);
+        function like(id) { openAd(); db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); }
+        function deleteVid(id) { if(confirm('حذف نهائي؟')) db.ref(`videos/${id}`).remove(); }
+        
+        function toggleChat() { const c = document.getElementById('chat-modal'); c.style.display = c.style.display === 'block' ? 'none' : 'block'; }
+        
+        function toggleAdmin() {
+            if(MY_ID.includes("GHOST")) {
+                const p = document.getElementById('admin-panel');
+                p.style.display = p.style.display === 'block' ? 'none' : 'block';
+            } else {
+                alert("Access Denied: Admin Only");
+            }
         }
 
-        function likeVideo(id) { openAd(); db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); }
-        function toggleChat() { const m = document.getElementById('chat-modal'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; }
-        function toggleAdmin() { alert("جاري التحقق من صلاحيات المسؤول..."); if(MY_ID.includes("GHOST")) { /* لوحة التحكم */ } }
-
-        function sendChat() {
+        function sendMsg() {
             const input = document.getElementById('chat-input');
             if(input.value) { db.ref('global_chat').push({ user: MY_ID, text: input.value }); input.value = ''; }
         }
 
-        db.ref('global_chat').limitToLast(15).on('value', s => {
-            const flow = document.getElementById('chat-content');
-            flow.innerHTML = '';
+        db.ref('global_chat').limitToLast(20).on('value', s => {
+            const box = document.getElementById('chat-box');
+            box.innerHTML = '';
             s.forEach(child => {
                 const m = child.val();
-                flow.innerHTML += `<div class="mb-1 text-[10px]"><b class="text-yellow-500">${m.user}:</b> ${m.text}</div>`;
+                box.innerHTML += `<div class="mb-1"><b>${m.user}:</b> ${m.text}</div>`;
             });
-            flow.scrollTop = flow.scrollHeight;
+            box.scrollTop = box.scrollHeight;
         });
 
         function startObserver() {
             const obs = new IntersectionObserver((entries) => {
-                entries.forEach(e => { 
-                    const v = e.target.querySelector('video'); 
-                    if (e.isIntersecting) v.play().catch(()=>{}); 
-                    else { v.pause(); v.currentTime = 0; } 
+                entries.forEach(e => {
+                    const v = e.target.querySelector('video');
+                    if(e.isIntersecting) v.play().catch(()=>{});
+                    else { v.pause(); v.currentTime = 0; }
                 });
             }, { threshold: 0.8 });
             document.querySelectorAll('.video-scroll-item').forEach(i => obs.observe(i));
