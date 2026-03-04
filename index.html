@@ -2,7 +2,8 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>SHΔDØW | THE ULTIMATE TITAN 2026</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SHΔDØW | YELLOW TITAN MOBILE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -11,115 +12,131 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Cairo:wght@300;900&display=swap');
         
-        :root { --primary: #00f3ff; --secondary: #ff0055; --bg: #020202; }
-        body { background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; overflow: hidden; height: 100vh; }
+        :root { --primary: #ffcc00; --bg: #050505; }
+        body, html { 
+            background: var(--bg); 
+            color: #fff; 
+            font-family: 'Cairo', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            height: 100%; 
+            overflow: hidden; 
+            width: 100%;
+        }
 
-        /* خلفية جزيئات النيون */
-        .hero-bg { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 50% 50%, #0a0f1a 0%, #000 100%); }
-        .hero-bg::after { content: ''; position: absolute; inset: 0; background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); opacity: 0.1; }
+        .video-container {
+            height: 100vh;
+            width: 100vw;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scrollbar-width: none;
+        }
+        .video-container::-webkit-scrollbar { display: none; }
 
-        /* الهيكل العملاق */
-        .titan-grid { display: grid; grid-template-columns: 100px 320px 1fr 320px; height: 100vh; gap: 0; }
+        .video-scroll-item {
+            height: 100vh;
+            width: 100vw;
+            scroll-snap-align: start;
+            position: relative;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        /* الألواح الزجاجية الفاخرة */
-        .glass-sidebar { background: rgba(255, 255, 255, 0.01); backdrop-filter: blur(50px); border-left: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; align-items: center; padding: 40px 0; z-index: 10; }
-        .glass-panel { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(30px); border-right: 1px solid rgba(255,255,255,0.05); padding: 30px; display: flex; flex-direction: column; }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
 
-        /* شبكة الفيديوهات الضخمة */
-        .main-display { padding: 40px; overflow-y: auto; scrollbar-width: none; background: linear-gradient(to bottom, transparent, rgba(0,243,255,0.02)); }
-        .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
+        .ui-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            pointer-events: none;
+            z-index: 10;
+        }
 
-        /* كرت الفيديو "التيتان" */
-        .titan-card { position: relative; aspect-ratio: 16/10; background: #000; border-radius: 30px; border: 1px solid rgba(255,255,255,0.05); overflow: hidden; transition: 0.7s cubic-bezier(0.2, 1, 0.2, 1); box-shadow: 0 20px 50px rgba(0,0,0,0.5); cursor: pointer; }
-        .titan-card:hover { transform: scale(1.05) translateY(-10px); border-color: var(--primary); box-shadow: 0 0 40px rgba(0, 243, 255, 0.2); }
-        
-        video { width: 100%; height: 100%; object-fit: cover; filter: grayscale(40%); transition: 0.5s; }
-        .titan-card:hover video { filter: grayscale(0%); transform: scale(1.1); }
+        .side-actions {
+            position: absolute;
+            right: 15px;
+            bottom: 100px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            z-index: 20;
+        }
 
-        /* تفاصيل الكرت */
-        .card-info { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 50%); display: flex; flex-direction: column; justify-content: flex-end; padding: 25px; opacity: 0; transition: 0.4s; }
-        .titan-card:hover .card-info { opacity: 1; }
+        .action-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+        }
 
-        /* الأزرار الذكية */
-        .btn-glow { background: rgba(255,255,255,0.05); width: 60px; height: 60px; border-radius: 20px; display: flex; align-items: center; justify-content: center; transition: 0.3s; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
-        .btn-glow:hover { background: var(--primary); color: #000; box-shadow: 0 0 25px var(--primary); transform: rotate(-5deg); }
-        
-        .upload-giant { background: linear-gradient(45deg, var(--primary), #0077ff); color: #000; font-family: 'Orbitron'; font-weight: 900; padding: 20px; border-radius: 25px; text-align: center; cursor: pointer; transition: 0.5s; box-shadow: 0 10px 30px rgba(0, 243, 255, 0.3); }
-        .upload-giant:hover { letter-spacing: 3px; transform: scale(1.02); box-shadow: 0 0 50px var(--primary); }
+        .action-btn.active i { color: var(--primary); }
+        .action-label { font-size: 10px; font-weight: bold; margin-top: 2px; }
 
-        /* شعار البرق */
-        .logo-vertical { font-family: 'Orbitron'; font-weight: 900; font-size: 20px; letter-spacing: 10px; writing-mode: vertical-rl; text-transform: uppercase; color: var(--primary); text-shadow: 0 0 20px var(--primary); }
+        .top-nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+        }
+
+        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--primary); font-size: 1.2rem; text-shadow: 0 0 10px var(--primary); }
+
+        .upload-trigger {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            color: #000;
+            width: 55px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            z-index: 100;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+        }
+
+        .user-tag { color: var(--primary); font-family: 'Orbitron'; font-size: 12px; margin-bottom: 5px; }
+        .video-desc { font-size: 14px; font-weight: 300; pointer-events: auto; }
     </style>
 </head>
 <body>
 
-    <div class="hero-bg"></div>
+    <nav class="top-nav">
+        <div class="logo">SHΔDØW</div>
+        <div class="text-[10px] bg-white/10 px-3 py-1 rounded-full border border-yellow-500/50" id="user-id">ID: ---</div>
+    </nav>
 
-    <div class="titan-grid">
-        <aside class="glass-sidebar">
-            <div class="logo-vertical mb-20">SHΔDØW</div>
-            <div class="flex flex-col gap-8">
-                <div class="btn-glow" onclick="openAd()"><i class="fas fa-home"></i></div>
-                <div class="btn-glow" onclick="openAd()"><i class="fas fa-compass"></i></div>
-                <div class="btn-glow" onclick="openAd()"><i class="fas fa-crown text-yellow-500"></i></div>
-                <div class="btn-glow" onclick="openAd()"><i class="fas fa-user-shield"></i></div>
-            </div>
-        </aside>
+    <div class="video-container" id="feed-container">
+        </div>
 
-        <section class="glass-panel">
-            <div class="mb-10">
-                <h3 class="text-[10px] font-[Orbitron] opacity-40 mb-2">SYSTEM_STATUS</h3>
-                <div class="flex items-center gap-3 bg-white/5 p-4 rounded-2xl border border-white/5">
-                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    <span class="text-xs font-bold">CORE_CONNECTED</span>
-                </div>
-            </div>
-
-            <div class="space-y-6">
-                <h3 class="text-[10px] font-[Orbitron] opacity-40">COMMUNITY_FEED</h3>
-                <div id="mini-chat" class="space-y-4 h-[300px] overflow-y-auto pr-2 opacity-60 text-xs">
-                    <div class="p-3 bg-white/5 rounded-xl border-r-2 border-cyan-500">مرحباً بك في نظام تيتان..</div>
-                </div>
-            </div>
-
-            <div class="mt-auto">
-                <div class="upload-giant" id="mega-upload">
-                    <i class="fas fa-cloud-arrow-up mr-2"></i> UPLOAD_DATA
-                </div>
-            </div>
-        </section>
-
-        <main class="main-display">
-            <header class="flex justify-between items-center mb-12">
-                <div>
-                    <h1 class="text-4xl font-black italic tracking-tighter">EXPLORE <span class="text-cyan-400">TITAN</span></h1>
-                    <p class="text-xs opacity-40 font-[Orbitron]">TOTAL_ENCRYPTED_ARCHIVE_v9.2</p>
-                </div>
-                <div class="flex gap-4">
-                    <div class="px-6 py-3 bg-white/5 rounded-full border border-white/10 text-xs font-bold" id="user-id">ID: ----</div>
-                </div>
-            </header>
-
-            <div class="video-grid" id="titan-grid">
-                <div class="col-span-full py-40 text-center">
-                    <i class="fas fa-atom fa-spin text-6xl text-cyan-500 opacity-20"></i>
-                </div>
-            </div>
-        </main>
-
-        <section class="glass-panel border-r-0 border-l border-white/5">
-            <h3 class="text-[10px] font-[Orbitron] opacity-40 mb-6">GLOBAL_RECORDS</h3>
-            <div class="space-y-4">
-                <div class="p-5 bg-gradient-to-br from-white/5 to-transparent rounded-3xl border border-white/5 hover:border-cyan-500/30 transition cursor-pointer" onclick="openAd()">
-                    <div class="text-[10px] opacity-50 mb-1">MOST_VIEWED_PROTOCOL</div>
-                    <div class="text-xl font-black text-cyan-400">#SHΔDØW_TOP</div>
-                </div>
-                <div class="p-5 bg-gradient-to-br from-white/5 to-transparent rounded-3xl border border-white/5">
-                    <div class="text-[10px] opacity-50 mb-1">NETWORK_TRAFFIC</div>
-                    <div class="text-xl font-black">99.9% UPTIME</div>
-                </div>
-            </div>
-        </section>
+    <div class="upload-trigger" id="mega-upload">
+        <i class="fas fa-plus"></i>
     </div>
 
     <script>
@@ -131,7 +148,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // نظام الإعلانات المزدوج المطور
         const AD_LINKS = [
             "https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e",
             "https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c"
@@ -151,54 +167,61 @@
         });
         document.getElementById("mega-upload").onclick = () => { openAd(); myWidget.open(); };
 
-        // جلب الفيديوهات للشبكة الضخمة
         db.ref('videos').on('value', (snapshot) => {
-            const grid = document.getElementById('titan-grid');
+            const container = document.getElementById('feed-container');
             const data = snapshot.val();
             if(!data) return;
-            grid.innerHTML = '';
+            container.innerHTML = '';
             Object.keys(data).reverse().forEach(id => {
                 const vid = data[id];
-                const card = document.createElement('div');
-                card.className = 'titan-card';
-                card.onclick = openAd;
-                card.innerHTML = `
-                    <video loop muted onmouseover="this.play()" onmouseout="this.pause(); this.currentTime=0" src="${vid.url}"></video>
-                    <div class="card-info">
-                        <div class="flex justify-between items-end">
-                            <div>
-                                <div class="text-[10px] font-[Orbitron] text-cyan-400">ENCRYPTED_USER</div>
-                                <div class="font-black text-lg">@${vid.sender}</div>
-                            </div>
-                            <div class="flex flex-col items-center gap-2" onclick="event.stopPropagation(); toggleLike('${id}')">
-                                <i class="fas fa-heart text-2xl text-red-500 shadow-lg"></i>
-                                <span class="text-xs font-bold">${vid.likes || 0}</span>
-                            </div>
+                const section = document.createElement('div');
+                section.className = 'video-scroll-item';
+                section.innerHTML = `
+                    <video loop playsinline src="${vid.url}" onclick="togglePlay(this)"></video>
+                    <div class="side-actions">
+                        <div class="action-btn" onclick="toggleLike('${id}')">
+                            <i class="fas fa-heart"></i>
+                            <span class="action-label">${vid.likes || 0}</span>
+                        </div>
+                        <div class="action-btn" onclick="openAd()">
+                            <i class="fas fa-share"></i>
+                            <span class="action-label">SHARE</span>
                         </div>
                     </div>
+                    <div class="ui-overlay">
+                        <div class="user-tag">@${vid.sender}</div>
+                        <div class="video-desc">SHΔDØW MISSION PROTOCOL V99 - SECURE_FEED</div>
+                    </div>
                 `;
-                grid.appendChild(card);
+                container.appendChild(section);
             });
+            initObserver();
         });
+
+        function togglePlay(v) {
+            if (v.paused) { v.play(); } else { v.pause(); }
+        }
 
         function toggleLike(id) {
             openAd();
             db.ref(`videos/${id}`).transaction(p => { if(p) p.likes = (p.likes || 0) + 1; return p; });
         }
 
-        // تحديث الدردشة البسيطة في الجانب
-        db.ref('global_chat').limitToLast(10).on('value', s => {
-            const chat = document.getElementById('mini-chat');
-            chat.innerHTML = '';
-            const val = s.val();
-            if(val) Object.values(val).forEach(m => {
-                const msg = document.createElement('div');
-                msg.className = 'p-3 bg-white/5 rounded-xl border-r-2 border-cyan-500';
-                msg.innerHTML = `<span class="text-cyan-400 font-bold block">${m.user}</span> ${m.text}`;
-                chat.appendChild(msg);
-            });
-            chat.scrollTop = chat.scrollHeight;
-        });
+        function initObserver() {
+            const options = { threshold: 0.6 };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const video = entry.target.querySelector('video');
+                    if (entry.isIntersecting) {
+                        video.play();
+                    } else {
+                        video.pause();
+                        video.currentTime = 0;
+                    }
+                });
+            }, options);
+            document.querySelectorAll('.video-scroll-item').forEach(item => observer.observe(item));
+        }
     </script>
 </body>
 </html>
