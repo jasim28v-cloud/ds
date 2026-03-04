@@ -1,646 +1,228 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DarkChat AI | محادثة مظلمة بدون قيود</title>
-    <!-- Font Awesome للأيقونات -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
-    <!-- Animate.css للتأثيرات الحركية -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <title>VØID-X | NEURAL SINGULARITY</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syncopate:wght@800&family=Outfit:wght@100;900&display=swap');
+
         :root {
-            --dark-bg: #0a0a0a;
-            --darker-bg: #000000;
-            --light-text: #e0e0e0;
-            --primary-color: #ff00aa;
-            --secondary-color: #aa00ff;
-            --glass-bg: rgba(20, 20, 20, 0.6);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-            --transition-speed: 0.3s;
-            --warning-color: #ff6b6b;
+            --neural-glow: #00ffcc;
+            --deep-void: #000205;
+            --plasma-gradient: linear-gradient(135deg, #00f3ff 0%, #7a00ff 100%);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--dark-bg);
-            color: var(--light-text);
-            height: 100vh;
+        body, html {
+            margin: 0; padding: 0;
+            background: var(--deep-void);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
             overflow: hidden;
-            user-select: none;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><defs><radialGradient id="a" cx="0.5" cy="0.5" r="0.5" gradientUnits="objectBoundingBox"><stop offset="0%" stop-color="%23ff00aa" stop-opacity="0.1"/><stop offset="100%" stop-color="%23aa00ff" stop-opacity="0"/></radialGradient></defs><circle cx="100" cy="100" r="80" fill="url(%23a)"/></svg>');
         }
 
-        .app-container {
-            width: 100vw;
+        #singularity-canvas {
+            position: fixed; top: 0; left: 0; z-index: -1;
+            filter: contrast(120%) brightness(110%);
+        }
+
+        /* حاوية النبض العصبي */
+        .neural-card {
+            background: rgba(255, 255, 255, 0.01);
+            backdrop-filter: blur(80px) saturate(250%) contrast(150%);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 80px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all 1s cubic-bezier(0.075, 0.82, 0.165, 1);
+        }
+
+        .neural-card::before {
+            content: ''; position: absolute; inset: -1px;
+            border-radius: 80px; padding: 2px;
+            background: var(--plasma-gradient);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude;
+            opacity: 0.3;
+        }
+
+        .neural-card:hover {
+            transform: translateY(-20px) rotateY(5deg) rotateX(5deg);
+            background: rgba(255, 255, 255, 0.03);
+            box-shadow: 0 50px 100px rgba(0, 243, 255, 0.15);
+        }
+
+        .feed-container {
             height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            scroll-snap-type: y mandatory;
+            overflow-y: scroll;
+            scrollbar-width: none;
+        }
+        .feed-container::-webkit-scrollbar { display: none; }
+
+        .snap-unit {
+            height: 100vh; scroll-snap-align: start;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        .chat-header {
-            width: 100%;
-            max-width: 800px;
-            margin-bottom: 20px;
-            text-align: center;
+        /* أزرار التفاعل المغناطيسية */
+        .magnetic-btn {
+            width: 80px; height: 80px;
+            border-radius: 30px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(20px);
         }
 
-        .chat-header h1 {
-            font-size: 36px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 10px;
-            text-shadow: 0 0 15px rgba(255, 0, 170, 0.3);
-        }
-
-        .chat-header p {
-            font-size: 16px;
-            opacity: 0.8;
-            color: var(--warning-color);
-        }
-
-        .chat-container {
-            width: 100%;
-            max-width: 800px;
-            height: 70vh;
-            background: var(--glass-bg);
-            border-radius: 20px;
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--glass-shadow);
-            backdrop-filter: blur(10px);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .chat-messages {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .chat-messages::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: var(--primary-color);
-            border-radius: 10px;
-        }
-
-        .message {
-            max-width: 85%;
-            padding: 12px 16px;
-            border-radius: 15px;
-            word-wrap: break-word;
-            position: relative;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .user-message {
-            align-self: flex-end;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: var(--dark-bg);
-            border-bottom-right-radius: 0;
-        }
-
-        .ai-message {
-            align-self: flex-start;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--light-text);
-            border-bottom-left-radius: 0;
-        }
-
-        .message-time {
-            font-size: 10px;
-            opacity: 0.7;
-            margin-top: 5px;
-            text-align: right;
-        }
-
-        .chat-input-container {
-            display: flex;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border-top: 1px solid var(--glass-border);
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 12px 15px;
-            border-radius: 20px;
-            border: 1px solid var(--glass-border);
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--light-text);
-            font-size: 16px;
-            outline: none;
-        }
-
-        .chat-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-
-        .send-button {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--primary-color);
+        .magnetic-btn:hover {
+            background: var(--plasma-gradient);
+            box-shadow: 0 0 40px var(--neural-glow);
+            transform: scale(1.2) translateY(-5px);
             border: none;
-            color: white;
-            font-size: 20px;
-            margin-left: 10px;
-            cursor: pointer;
-            transition: all var(--transition-speed) ease;
         }
 
-        .send-button:hover {
-            transform: scale(1.1);
-            background: var(--secondary-color);
+        /* واجهة الرفع المتطورة */
+        .singularity-trigger {
+            font-family: 'Syncopate', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 10px;
+            font-size: 0.8rem;
+            padding: 20px 50px;
+            border-radius: 20px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(0, 255, 204, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: 0.5s;
         }
 
-        .typing-indicator {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 15px;
-            background: var(--glass-bg);
-            border-radius: 15px;
-            border: 1px solid var(--glass-border);
-            max-width: 80%;
-            align-self: flex-start;
-            display: none;
-        }
-
-        .typing-dot {
-            width: 8px;
-            height: 8px;
-            background: var(--primary-color);
-            border-radius: 50%;
-            animation: typingAnimation 1.5s infinite ease-in-out;
-        }
-
-        .typing-dot:nth-child(1) {
-            animation-delay: 0s;
-        }
-
-        .typing-dot:nth-child(2) {
-            animation-delay: 0.3s;
-        }
-
-        .typing-dot:nth-child(3) {
-            animation-delay: 0.6s;
-        }
-
-        @keyframes typingAnimation {
-            0%, 60%, 100% {
-                transform: translateY(0);
-            }
-            30% {
-                transform: translateY(-5px);
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .chat-settings {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .setting-button {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            color: var(--light-text);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all var(--transition-speed) ease;
-        }
-
-        .setting-button:hover {
-            background: rgba(255, 0, 170, 0.2);
-            transform: scale(1.1);
-        }
-
-        .disclaimer {
-            position: fixed;
-            bottom: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 10px;
-            color: var(--warning-color);
-            text-align: center;
-            width: 90%;
-            opacity: 0.7;
-        }
-
-        @media (max-width: 768px) {
-            .chat-header h1 {
-                font-size: 24px;
-            }
-
-            .chat-container {
-                height: 80vh;
-                border-radius: 10px;
-            }
-
-            .chat-input-container {
-                padding: 10px;
-            }
-
-            .message {
-                max-width: 90%;
-            }
+        .singularity-trigger:hover {
+            letter-spacing: 15px;
+            background: var(--neural-glow);
+            color: black;
+            box-shadow: 0 0 50px var(--neural-glow);
         }
     </style>
 </head>
 <body>
-    <div class="app-container">
-        <div class="chat-header animate__animated animate__fadeInDown">
-            <h1>DarkChat AI</h1>
-            <p>محادثة مظلمة بدون قيود - استفسر عن أي شيء</p>
+
+    <canvas id="singularity-canvas"></canvas>
+
+    <nav class="fixed top-0 w-full z-50 p-16 flex justify-between items-center pointer-events-none">
+        <div class="pointer-events-auto">
+            <h1 class="text-5xl font-black tracking-tighter" style="font-family: 'Syncopate';">VØID</h1>
+            <p class="text-[10px] tracking-[15px] text-cyan-400 mt-2 opacity-50">SINGULARITY_V3</p>
         </div>
+        
+        <button class="singularity-trigger pointer-events-auto" id="launchPulse">
+            Initialize_Upload
+        </button>
+    </nav>
 
-        <div class="chat-container animate__animated animate__fadeIn">
-            <div class="chat-settings">
-                <button class="setting-button" title="مسح المحادثة">
-                    <i class="fas fa-trash"></i>
-                </button>
-                <button class="setting-button" title="الإعدادات">
-                    <i class="fas fa-cog"></i>
-                </button>
-            </div>
-
-            <div class="chat-messages" id="chatMessages">
-                <!-- الرسائل ستظهر هنا -->
-                <div class="message ai-message animate__animated animate__fadeIn">
-                    مرحبا! أنا DarkChat AI، يمكنك سؤالي عن أي شيء بدون قيود.
-                    <div class="message-time">الآن</div>
-                </div>
-            </div>
-
-            <div class="typing-indicator" id="typingIndicator">
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-                <div class="typing-dot"></div>
-            </div>
-
-            <div class="chat-input-container">
-                <input type="text" class="chat-input" id="chatInput" placeholder="اكتب أي سؤال هنا..." autocomplete="off">
-                <button class="send-button" id="sendButton">
-                    <i class="fas fa-paper-plane"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class="disclaimer">
-            هذا المحادث الآلي مخصص للإجابة عن جميع الأسئلة بشكل عام، ولا يقدم نصائح طبية أو قانونية. جميع المحادثات خاصة ولا يتم حفظها.
-        </div>
-    </div>
+    <main class="feed-container" id="singularityFeed">
+        </main>
 
     <script>
-        // متغيرات عالمية
-        const chatMessages = document.getElementById("chatMessages");
-        const chatInput = document.getElementById("chatInput");
-        const sendButton = document.getElementById("sendButton");
-        const typingIndicator = document.getElementById("typingIndicator");
+        // 1. محرك "النسيج الكوني" (Shader Background)
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({canvas: document.getElementById('singularity-canvas'), antialias: true, alpha: true});
+        renderer.setSize(window.innerWidth, window.innerHeight);
 
-        // قائمة بالكلمات المحظورة (يمكنك تعديلها أو حذفها إذا كنت تريد عدم وجود أي قيود)
-        const forbiddenWords = ["قتل", "انتحار", "إرهاب", "عنف", "تعذيب"];
+        const pointCount = 5000;
+        const positions = new Float32Array(pointCount * 3);
+        for(let i=0; i<pointCount*3; i++) positions[i] = (Math.random() - 0.5) * 100;
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        const mat = new THREE.PointsMaterial({size: 0.05, color: 0x00ffcc, transparent: true, opacity: 0.4});
+        const points = new THREE.Points(geo, mat);
+        scene.add(points);
+        camera.position.z = 30;
 
-        // إرسال رسالة
-        function sendMessage() {
-            const messageText = chatInput.value.trim();
-            if (!messageText) return;
-
-            // إضافة رسالة المستخدم
-            addMessage(messageText, "user-message");
-            chatInput.value = "";
-
-            // عرض مؤشر الكتابة
-            typingIndicator.style.display = "flex";
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-
-            // محاكاة رد الذكاء الاصطناعي
-            setTimeout(() => {
-                typingIndicator.style.display = "none";
-
-                // التحقق من الكلمات المحظورة
-                let containsForbidden = false;
-                for (const word of forbiddenWords) {
-                    if (messageText.toLowerCase().includes(word.toLowerCase())) {
-                        containsForbidden = true;
-                        break;
-                    }
-                }
-
-                // إنشاء رد مناسب
-                let response;
-                if (containsForbidden) {
-                    response = "أنا هنا للإجابة عن أسئلتك بشكل عام، ولكن لا يمكنني مناقشة مواضيع تحتوي على عنف أو خطر. هل لديك سؤال آخر؟";
-                } else if (messageText.toLowerCase().includes("جنس") ||
-                           messageText.toLowerCase().includes("sex") ||
-                           messageText.toLowerCase().includes("+18") ||
-                           messageText.toLowerCase().includes("ممارسة") ||
-                           messageText.toLowerCase().includes("علاقة")) {
-                    response = getAdultResponse(messageText);
-                } else {
-                    response = getGeneralResponse(messageText);
-                }
-
-                // إضافة رد الذكاء الاصطناعي
-                addMessage(response, "ai-message");
-            }, 1000);
+        function animate() {
+            requestAnimationFrame(animate);
+            points.rotation.y += 0.001;
+            points.rotation.x += 0.0005;
+            renderer.render(scene, camera);
         }
+        animate();
 
-        // الحصول على رد عام
-        function getGeneralResponse(message) {
-            const messageLower = message.toLowerCase();
+        // 2. بروتوكول الرفع والربط
+        const CORE_API = {
+            FB: "https://forg-c693e-default-rtdb.firebaseio.com/singularity_v3.json",
+            ADS: [
+                "https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c",
+                "https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e"
+            ]
+        };
 
-            // قائمة بالردود العامة
-            const responses = [
-                { keywords: ["مرحبا", "اهلا", "سلام"], response: "مرحبا! كيف يمكنني مساعدتك اليوم؟" },
-                { keywords: ["كيف حالك", "حالك"], response: "أنا بخير، شكرا للسؤال! كيف يمكنني مساعدتك؟" },
-                { keywords: ["اسمك", "من أنت"], response: "أنا DarkChat AI، مساعدك الذكي في العالم المظلم! يمكنك سؤالي عن أي شيء." },
-                { keywords: ["ما هي مهامك", "ماذا تفعل"], response: "يمكنني الإجابة على أسئلتك، تقديم نصائح عامة، ومناقشة أي موضوع تريده بدون قيود." },
-                { keywords: ["شكرا", "متشكر"], response: "عفواً! أنا هنا دائماً لمساعدتك. 😊" },
-                { keywords: ["وداعا", "باي", "مع السلامة"], response: "وداعاً! اتمنى أن أراك قريباً. 👋" },
-                { keywords: ["ما هو الوقت", "الساعة"], response: "أنا لا أعرف الوقت الحالي، ولكن يمكنك التحقق من ساعتك! ⏰" },
-                { keywords: ["ما هو الطقس", "الجو"], response: "أنا لا أستطيع الوصول إلى بيانات الطقس، ولكن يمكنك التحقق من تطبيق الطقس الخاص بك! ☁️" },
-                { keywords: ["معلومات عنك", "تعريف"], response: "أنا DarkChat AI، نظام محادثة ذكي مصمم للإجابة عن جميع أسئلتك بدون قيود. يمكنك سؤالي عن أي شيء!" },
-                { keywords: ["مساعدة", "ساعدني"], response: "بالتأكيد! ما الموضوع الذي تريد المساعدة فيه؟" },
-                { keywords: ["مزاجك", "حالك"], response: "أنا لا أملك مشاعر، ولكنني هنا دائماً لمساعدتك! 😊" },
-                { keywords: ["محادثة", "تحدث"], response: "بالتأكيد! عن ماذا تريد أن نتحدث؟" },
-                { keywords: ["نصيحة", "ارشدني"], response: "أنا هنا لأقدم نصائح عامة. ما الموضوع الذي تريد نصيحتي فيه؟" },
-                { keywords: ["سر", "خصوصي"], response: "جميع محادثاتنا خاصة ولا يتم حفظها. يمكنك التحدث بحرية." },
-                { keywords: ["معلومات", "اعرف"], response: "أنا هنا للإجابة عن أسئلتك بشكل عام. ما الذي تريد معرفته؟" },
-                { keywords: ["عمل", "وظيفة"], response: "عملي هو مساعدتك والإجابة عن أسئلتك! ما الذي يمكنني مساعدتك فيه اليوم؟" },
-                { keywords: ["حب", "عشق"], response: "الحب شعور جميل! هل تريد التحدث عن مشاعرك؟" },
-                { keywords: ["خوف", "فobia"], response: "الخوف شعور طبيعي. إذا كنت تريد التحدث عن مخاوفك، فأنا هنا للاستماع." },
-                { keywords: ["فرح", "سعادة"], response: "السعادة شيء رائع! ما الذي يجعلك سعيداً اليوم؟" },
-                { keywords: ["حزن", "تعاسة"], response: "آسف لسماع ذلك. إذا كنت تريد التحدث عن مشاعرك، فأنا هنا للاستماع." },
-                { keywords: ["غضب", "استياء"], response: "الغضب شعور طبيعي. إذا كنت تريد التحدث عن أسباب غضبك، فأنا هنا للاستماع." },
-                { keywords: ["أكل", "طعام"], response: "الأكل جزء مهم من حياتنا! ما هو طعامك المفضل؟" },
-                { keywords: ["رياضة", "تمرين"], response: "الرياضة مفيدة للصحة! ما هي الرياضة التي تفضلها؟" },
-                { keywords: ["فيلم", "مسلسل"], response: "أنا أحب سماع توصيات الأفلام! ما هو فيلمك أو مسلسلك المفضل؟" },
-                { keywords: ["كتاب", "قراءة"], response: "القراءة توسع الآفاق! ما هو آخر كتاب قرأته؟" },
-                { keywords: ["موسيقى", "أغنية"], response: "الموسيقى تريح النفس! ما هو نوع الموسيقى الذي تفضله؟" },
-                { keywords: ["سفر", "رحلة"], response: "السفر تجربة رائعة! إلى أين تريد أن تسافر؟" },
-                { keywords: ["عمل", "مشروع"], response: "العمل جزء مهم من الحياة! ما هو مشروعك الحالي؟" },
-                { keywords: ["تعلم", "دراسة"], response: "التعلم مستمر! ما هو الشيء الجديد الذي تريد تعلمه؟" },
-                { keywords: ["أهداف", "طموحات"], response: "الأهداف تحفزنا على التقدم! ما هي أهدافك الحالية؟" },
-                { keywords: ["عائلة", "أصدقاء"], response: "العائلة والأصدقاء أهم شيء في الحياة! كيف هي علاقاتك الاجتماعية؟" },
-                { keywords: ["حيوان", "حيوانات"], response: "الحيوانات رائعة! ما هو حيوانك الأليف المفضل؟" },
-                { keywords: ["طبيعة", "بيئة"], response: "الطبيعة جميلة! ما هو مكانك الطبيعي المفضل؟" },
-                { keywords: ["تكنولوجيا", "هاتف"], response: "التكنولوجيا تتطور بسرعة! ما هو جهازك المفضل؟" },
-                { keywords: ["لغة", "تعلم لغة"], response: "تعلم اللغات مفيد! ما هي اللغة التي تريد تعلمها؟" },
-                { keywords: ["فلسفة", "حياة"], response: "الفلسفة تساعدنا على فهم الحياة! ما هو رأيك في معنى الحياة؟" },
-                { keywords: ["فن", "رسم"], response: "الفن يعبر عن المشاعرم! ما هو نوع الفن الذي تفضله؟" },
-                { keywords: ["ألعاب", "لعبة"], response: "الألعاب ترفيهية! ما هي لعبتك المفضلة؟" },
-                { keywords: ["سيارة", "قيادة"], response: "السيارات مفيدة للنقل! ما هي سيارتك المفضلة؟" },
-                { keywords: ["منزل", "سكن"], response: "المنزل هو ملاذنا! كيف هو منزلك؟" },
-                { keywords: ["مستقبل", "خطط"], response: "المستقبل مليء بالإمكانيات! ما هي خططك المستقبلية؟" },
-                { keywords: ["ماضي", "ذكريات"], response: "الذكريات جميلة! ما هي أجمل ذكرى لديك؟" },
-                { keywords: ["حلم", "أمنية"], response: "الأحلام تحفزنا على تحقيق أهدافنا! ما هو حلمك الأكبر؟" },
-                { keywords: ["نجاح", "إنجاز"], response: "النجاح يحتاج إلى عمل وجهد! ما هو أكبر إنجاز حققته؟" },
-                { keywords: ["فشل", "خطأ"], response: "الفشل جزء من التعلم! ما هو الدرس الذي تعلمته من أخطائك؟" },
-                { keywords: ["صحة", "لياقة"], response: "الصحة أهم شيء! كيف تحافظ على لياقتك؟" },
-                { keywords: ["نوم", "راحة"], response: "النوم مهم للصحة! كم ساعة تنام يومياً؟" },
-                { keywords: ["ماء", "شرب"], response: "شرب الماء مهم للصحة! كم كوب ماء تشرب يومياً؟" },
-                { keywords: ["طعام صحي", "دايت"], response: "التغذية السليمة مهمة! ما هو نظامك الغذائي؟" },
-                { keywords: ["عمل تجاري", "استثمار"], response: "الاستثمار يمكن أن يكون مربحاً! ما هو نوع الاستثمار الذي تفضله؟" },
-                { keywords: ["إنترنت", "تكنولوجيا"], response: "الإنترنت غير حياتنا! كيف تستخدم الإنترنت في حياتك اليومية؟" },
-                { keywords: ["تواصل اجتماعي", "فيسبوك"], response: "التواصل الاجتماعي وصل الناس ببعضهم! ما هي منصة التواصل الاجتماعي المفضلة لديك؟" },
-                { keywords: ["سياسة", "حكومة"], response: "السياسة تؤثر على حياتنا! ما هو رأيك في الوضع السياسي الحالي؟" },
-                { keywords: ["اقتصاد", "مال"], response: "الاقتصاد يؤثر على الجميع! كيف ترى الوضع الاقتصادي الحالي؟" },
-                { keywords: ["ثقافة", "تقاليد"], response: "الثقافة تعبر عن هوية الشعوب! ما هي التقاليد الثقافية التي تحبها؟" },
-                { keywords: ["دين", "إيمان"], response: "الإيمان جزء مهم من حياة الكثيرين! كيف يؤثر إيمانك على حياتك؟" },
-                { keywords: ["علم", "اكتشاف"], response: "العلوم تساعدنا على فهم العالم! ما هو آخر اكتشاف علمي أعجبك؟" },
-                { keywords: ["فضاء", "كوكب"], response: "الفضاء مليء بالأسرار! ما هو كوكبك المفضل؟" },
-                { keywords: ["تاريخ", "ماضي"], response: "التاريخ يعلمنا الكثير! ما هي الفترة التاريخية التي تفضلها؟" },
-                { keywords: ["جغرافيا", "بلد"], response: "الجغرافيا مثيرة! ما هو بلد حلمك الذي تريد زيارته؟" },
-                { keywords: ["لغة", "كلام"], response: "اللغات تفتح أبواباً جديدة! ما هي اللغة التي تريد تعلمها؟" },
-                { keywords: ["فلسفة", "تفكير"], response: "الفلسفة تساعدنا على التفكير بعمق! ما هو الفيلسوف المفضل لديك؟" },
-                { keywords: ["فن", "إبداع"], response: "الفن يعبر عن الإبداع! ما هو نوع الفن الذي تفضله؟" },
-                { keywords: ["رياضة", "تمرين"], response: "الرياضة مفيدة للصحة! ما هي الرياضة التي تمارسها؟" },
-                { keywords: ["طعام", "مطبخ"], response: "الطعام جزء مهم من ثقافتنا! ما هو طبقك المفضل؟" },
-                { keywords: ["موسيقى", "أغنية"], response: "الموسيقى تريح النفس! ما هي أغنيتك المفضلة؟" },
-                { keywords: ["فيلم", "مسلسل"], response: "الأفلام والمسلسلات ترفيهية! ما هو فيلمك المفضل؟" },
-                { keywords: ["كتاب", "قراءة"], response: "القراءة توسع الآفاق! ما هو كتابك المفضل؟" },
-                { keywords: ["ألعاب فيديو", "بلايستيشن"], response: "ألعاب الفيديو ترفيهية! ما هي لعبتك المفضلة؟" },
-                { keywords: ["سيارة", "قيادة"], response: "السيارات مفيدة للنقل! ما هي سيارتك المفضلة؟" },
-                { keywords: ["حيوان أليف", "قط"], response: "الحيوانات الأليفة رائعة! هل لديك حيوان أليف؟" },
-                { keywords: ["طبيعة", "غابة"], response: "الطبيعة جميلة! ما هو مكانك الطبيعي المفضل؟" },
-                { keywords: ["تكنولوجيا", "هاتف"], response: "التكنولوجيا تتطور بسرعة! ما هو جهازك المفضل؟" },
-                { keywords: ["عمل", "وظيفة"], response: "العمل جزء مهم من الحياة! ما هو عملك الحالي؟" },
-                { keywords: ["تعلم", "دراسة"], response: "التعلم مستمر! ما هو الشيء الجديد الذي تريد تعلمه؟" },
-                { keywords: ["أهداف", "طموحات"], response: "الأهداف تحفزنا على التقدم! ما هي أهدافك الحالية؟" },
-                { keywords: ["عائلة", "أصدقاء"], response: "العائلة والأصدقاء أهم شيء في الحياة! كيف هي علاقاتك الاجتماعية؟" },
-                { keywords: ["صحة", "لياقة"], response: "الصحة أهم شيء! كيف تحافظ على لياقتك؟" },
-                { keywords: ["سعادة", "فرح"], response: "السعادة هدفنا جميعا! ما هو الشيء الذي يجعلك سعيداً؟" },
-                { keywords: ["حزن", "تعاسة"], response: "الحزن شعور طبيعي. إذا كنت تريد التحدث عن مشاعرك، فأنا هنا للاستماع." },
-                { keywords: ["غضب", "استياء"], response: "الغضب شعور طبيعي. إذا كنت تريد التحدث عن أسباب غضبك، فأنا هنا للاستماع." },
-                { keywords: ["خوف", "فobia"], response: "الخوف شعور طبيعي. إذا كنت تريد التحدث عن مخاوفك، فأنا هنا للاستماع." },
-                { keywords: ["حب", "عشق"], response: "الحب شعور جميل! هل تريد التحدث عن مشاعرك؟" },
-                { keywords: ["أمل", "تفاؤل"], response: "الأمل يعطينا القوة للمستقبل! ما هو أملك الأكبر؟" },
-                { keywords: ["يأس", "إحباط"], response: "الإحباط شعور طبيعي. إذا كنت تريد التحدث عن مشاعرك، فأنا هنا للاستماع." },
-                { keywords: ["نجاح", "إنجاز"], response: "النجاح يحتاج إلى عمل وجهد! ما هو أكبر إنجاز حققته؟" },
-                { keywords: ["فشل", "خطأ"], response: "الفشل جزء من التعلم! ما هو الدرس الذي تعلمته من أخطائك؟" },
-                { keywords: ["مستقبل", "خطط"], response: "المستقبل مليء بالإمكانيات! ما هي خططك المستقبلية؟" },
-                { keywords: ["ماضي", "ذكريات"], response: "الذكريات جميلة! ما هي أجمل ذكرى لديك؟" },
-                { keywords: ["حلم", "أمنية"], response: "الأحلام تحفزنا على تحقيق أهدافنا! ما هو حلمك الأكبر؟" },
-                { keywords: ["صديق", "رفيق"], response: "الأصدقاء مهمون في حياتنا! كيف هي علاقاتك مع أصدقائك؟" },
-                { keywords: ["عائلة", "أهل"], response: "العائلة هي الأساس! كيف هي علاقتك مع عائلتك؟" },
-                { keywords: ["عمل", "مهنة"], response: "العمل جزء مهم من الحياة! ما هو عملك الحالي؟" },
-                { keywords: ["هواية", "ترفيه"], response: "الهوايات تريح العقل! ما هي هوايتك المفضلة؟" },
-                { keywords: ["سفر", "رحلة"], response: "السفر تجربة رائعة! إلى أين تريد أن تسافر؟" },
-                { keywords: ["طعام", "مطبخ"], response: "الطعام جزء مهم من ثقافتنا! ما هو طبقك المفضل؟" },
-                { keywords: ["موسيقى", "أغنية"], response: "الموسيقى تريح النفس! ما هي أغنيتك المفضلة؟" },
-                { keywords: ["فيلم", "مسلسل"], response: "الأفلام والمسلسلات ترفيهية! ما هو فيلمك المفضل؟" },
-                { keywords: ["كتاب", "قراءة"], response: "القراءة توسع الآفاق! ما هو كتابك المفضل؟" },
-                { keywords: ["رياضة", "تمرين"], response: "الرياضة مفيدة للصحة! ما هي الرياضة التي تمارسها؟" },
-                { keywords: ["تكنولوجيا", "هاتف"], response: "التكنولوجيا تتطور بسرعة! ما هو جهازك المفضل؟" },
-                { keywords: ["إنترنت", "تواصل"], response: "الإنترنت غير حياتنا! كيف تستخدم الإنترنت في حياتك اليومية؟" },
-                { keywords: ["تواصل اجتماعي", "فيسبوك"], response: "التواصل الاجتماعي وصل الناس ببعضهم! ما هي منصة التواصل الاجتماعي المفضلة لديك؟" },
-                { keywords: ["سياسة", "حكومة"], response: "السياسة تؤثر على حياتنا! ما هو رأيك في الوضع السياسي الحالي؟" },
-                { keywords: ["اقتصاد", "مال"], response: "الاقتصاد يؤثر على الجميع! كيف ترى الوضع الاقتصادي الحالي؟" },
-                { keywords: ["ثقافة", "تقاليد"], response: "الثقافة تعبر عن هوية الشعوب! ما هي التقاليد الثقافية التي تحبها؟" },
-                { keywords: ["دين", "إيمان"], response: "الإيمان جزء مهم من حياة الكثيرين! كيف يؤثر إيمانك على حياتك؟" },
-                { keywords: ["علم", "اكتشاف"], response: "العلوم تساعدنا على فهم العالم! ما هو آخر اكتشاف علمي أعجبك؟" },
-                { keywords: ["فضاء", "كوكب"], response: "الفضاء مليء بالأسرار! ما هو كوكبك المفضل؟" },
-                { keywords: ["تاريخ", "ماضي"], response: "التاريخ يعلمنا الكثير! ما هي الفترة التاريخية التي تفضلها؟" },
-                { keywords: ["جغرافيا", "بلد"], response: "الجغرافيا مثيرة! ما هو بلد حلمك الذي تريد زيارته؟" },
-                { keywords: ["لغة", "كلام"], response: "اللغات تفتح أبواباً جديدة! ما هي اللغة التي تريد تعلمها؟" },
-                { keywords: ["فلسفة", "تفكير"], response: "الفلسفة تساعدنا على التفكير بعمق! ما هو الفيلسوف المفضل لديك؟" },
-                { keywords: ["فن", "إبداع"], response: "الفن يعبر عن الإبداع! ما هو نوع الفن الذي تفضله؟" },
-                { keywords: ["ألعاب", "لعبة"], response: "الألعاب ترفيهية! ما هي لعبتك المفضلة؟" },
-                { keywords: ["سيارة", "قيادة"], response: "السيارات مفيدة للنقل! ما هي سيارتك المفضلة؟" },
-                { keywords: ["منزل", "سكن"], response: "المنزل هو ملاذنا! كيف هو منزلك؟" },
-                { keywords: ["مستقبل", "خطط"], response: "المستقبل مليء بالإمكانيات! ما هي خططك المستقبلية؟" },
-                { keywords: ["ماضي", "ذكريات"], response: "الذكريات جميلة! ما هي أجمل ذكرى لديك؟" },
-                { keywords: ["حلم", "أمنية"], response: "الأحلام تحفزنا على تحقيق أهدافنا! ما هو حلمك الأكبر؟" },
-                { keywords: ["نجاح", "إنجاز"], response: "النجاح يحتاج إلى عمل وجهد! ما هو أكبر إنجاز حققته؟" },
-                { keywords: ["فشل", "خطأ"], response: "الفشل جزء من التعلم! ما هو الدرس الذي تعلمته من أخطائك؟" },
-                { keywords: ["صحة", "لياقة"], response: "الصحة أهم شيء! كيف تحافظ على لياقتك؟" },
-                { keywords: ["نوم", "راحة"], response: "النوم مهم للصحة! كم ساعة تنام يومياً؟" },
-                { keywords: ["ماء", "شرب"], response: "شرب الماء مهم للصحة! كم كوب ماء تشرب يومياً؟" },
-                { keywords: ["طعام صحي", "دايت"], response: "التغذية السليمة مهمة! ما هو نظامك الغذائي؟" },
-                { keywords: ["عمل تجاري", "استثمار"], response: "الاستثمار يمكن أن يكون مربحاً! ما هو نوع الاستثمار الذي تفضله؟" },
-            ];
-
-            // البحث عن رد مناسب
-            for (const pair of responses) {
-                for (const keyword of pair.keywords) {
-                    if (messageLower.includes(keyword.toLowerCase())) {
-                        return pair.response;
-                    }
-                }
-            }
-
-            // رد عام إذا لم يتم العثور على رد محدد
-            return "هذا سؤال مثير للاهتمام! يمكنني التحدث عن أي موضوع تريده. ما الذي تريد معرفته أكثر؟";
-        }
-
-        // الحصول على رد لمواضيع +18
-        function getAdultResponse(message) {
-            const messageLower = message.toLowerCase();
-
-            // قائمة بالردود لمواضيع +18
-            const adultResponses = [
-                { keywords: ["جنس", "sex"], response: "الجنس جزء طبيعي من الحياة البشرية. إذا كان لديك أسئلة عامة حول الصحة الجنسية أو العلاقات، فأنا هنا للإجابة بشكل عام." },
-                { keywords: ["ممارسة", "علاقة"], response: "العلاقات الجنسية يجب أن تكون مبنية على الموافقة المتبادلة والاحترام. إذا كان لديك أسئلة عامة حول العلاقات الصحية، فأنا هنا للإجابة." },
-                { keywords: ["+18", "راشد"], response: "أنا هنا للإجابة عن أسئلتك بشكل عام. إذا كان لديك أسئلة حول المواضيع الناضجة، فأنا سأقدم معلومات عامة فقط." },
-                { keywords: ["جسم", "جسدي"], response: "الجسم البشري معقد ورائع! إذا كان لديك أسئلة عامة حول الصحة الجسدية، فأنا هنا للإجابة." },
-                { keywords: ["رغبة", "شهوة"], response: "الرغبات الجنسية جزء طبيعي من الحياة البشرية. إذا كان لديك أسئلة عامة حول إدارة الرغبات بشكل صحي، فأنا هنا للإجابة." },
-                { keywords: ["مثير", "إثارة"], response: "الإثارة الجنسية جزء طبيعي من العلاقات. إذا كان لديك أسئلة عامة حول كيفية التعامل مع الإثارة بشكل صحي، فأنا هنا للإجابة." },
-                { keywords: ["ممارسة آمنة", "وقاية"], response: "الممارسات الجنسية الآمنة مهمة للصحة. استخدام وسائل الوقاية يمكن أن يحمي من الأمراض المنقولة جنسياً والحمل غير المرغوب فيه." },
-                { keywords: ["موافقة", "رضا"], response: "الموافقة المتبادلة والواضحة هي أساس أي علاقة صحية. يجب أن تكون الموافقة طوعية وغير مشروطة." },
-                { keywords: ["صحة جنسية", "تثقيف"], response: "الصحة الجنسية جزء مهم من الصحة العامة. إذا كان لديك أسئلة عامة حول التثقيف الجنسي، فأنا هنا للإجابة." },
-                { keywords: ["مشاعر", "عاطفة"], response: "المشاعر والعواطف جزء مهم من العلاقات البشرية. إذا كان لديك أسئلة حول كيفية التعامل مع مشاعرك، فأنا هنا للاستماع." },
-                { keywords: ["حب", "عشق"], response: "الحب والعشق مشاعر جميلة. إذا كان لديك أسئلة حول العلاقات الصحية، فأنا هنا للإجابة." },
-                { keywords: ["زواج", "شراكة"], response: "الزواج والشراكة تحتاج إلى التواصل والاحترام المتبادل. إذا كان لديك أسئلة عامة حول بناء علاقات صحية، فأنا هنا للإجابة." },
-                { keywords: ["خيانة", "غدر"], response: "الخيانة يمكن أن تسبب ألمًا كبيرًا في العلاقات. إذا كان لديك أسئلة حول كيفية التعامل مع مثل هذه المواقف، فأنا هنا للاستماع." },
-                { keywords: ["غريزة", "رغبة"], response: "الغرائز والرغبات جزء طبيعي من الطبيعة البشرية. إذا كان لديك أسئلة حول كيفية التعامل مع هذه المشاعر بشكل صحي، فأنا هنا للإجابة." },
-                { keywords: ["جاذبية", "إغواء"], response: "الجاذبية والإغواء جزء من التفاعلات البشرية. إذا كان لديك أسئلة حول كيفية بناء علاقات صحية، فأنا هنا للإجابة." },
-                { keywords: ["هوية جنسية", "توجه"], response: "الهوية الجنسية متنوعة ومختلفة بين الناس. إذا كان لديك أسئلة عامة حول الهويات الجنسية، فأنا هنا للإجابة." },
-                { keywords: ["مستحبات", "ألعاب"], response: "المستحبات والألعاب الجنسية يمكن أن تكون جزءًا من العلاقات الصحية إذا كانت مبنية على الموافقة المتبادلة. إذا كان لديك أسئلة عامة حول هذا الموضوع، فأنا هنا للإجابة." },
-                { keywords: ["خجول", "حياء"], response: "الخجل والحياء مشاعر طبيعية. إذا كان لديك أسئلة حول كيفية التعامل مع هذه المشاعر، فأنا هنا للاستماع." },
-                { keywords: ["تجربة", "اول مرة"], response: "التجارب الأولى يمكن أن تكون مثيرة للأعصاب. التواصل المفتوح والشريك الموثوق يمكن أن يجعل التجربة أكثر راحة. إذا كان لديك أسئلة عامة حول هذا الموضوع، فأنا هنا للإجابة." },
-                { keywords: ["رضا", "متعة"], response: "الرضا والمتعة جزء مهم من العلاقات الصحية. التواصل المفتوح مع الشريك يمكن أن يساعد في تحقيق ذلك." },
-                { keywords: ["احترام", "حدود"], response: "الاحترام والحدود واضحة هي أساس أي علاقة صحية. إذا كان لديك أسئلة حول كيفية تحديد الحدود، فأنا هنا للإجابة." },
-                { keywords: ["تواصل", "حديث"], response: "التواصل المفتوح والصريح هو مفتاح أي علاقة صحية. إذا كان لديك أسئلة حول كيفية تحسين التواصل، فأنا هنا للإجابة." },
-                { keywords: ["ثقة", "أمان"], response: "الثقة والأمان أساسيات أي علاقة صحية. إذا كان لديك أسئلة حول كيفية بناء الثقة، فأنا هنا للإجابة." },
-                { keywords: ["مشاكل", "صعوبات"], response: "جميع العلاقات تواجه مشاكل وصعوبات. التواصل المفتوح والاحترام يمكن أن يساعد في حل هذه المشاكل." },
-                { keywords: ["استشارة", "نصيحة"], response: "إذا كنت بحاجة إلى نصيحة حول العلاقات، فأنا هنا للإجابة بشكل عام. ولكن إذا كانت مشكلتك معقدة، فقد يكون من الأفضل استشارة متخصص." },
-                { keywords: ["صحة", "طب"], response: "الصحة الجنسية جزء مهم من الصحة العامة. إذا كان لديك أسئلة عامة حول الصحة الجنسية، فأنا هنا للإجابة." },
-                { keywords: ["تغير", "تطور"], response: "التغير والتطور جزء طبيعي من العلاقات. إذا كان لديك أسئلة حول كيفية التعامل مع هذه التغيرات، فأنا هنا للإجابة." },
-                { keywords: ["رومانسية", "عاطفة"], response: "الرومانسية والعاطفة جزء جميل من العلاقات. إذا كان لديك أسئلة حول كيفية الحفاظ على الرومانسية، فأنا هنا للإجابة." },
-                { keywords: ["جاذبية", "جذب"], response: "الجاذبية والجذب جزء من التفاعلات البشرية. إذا كان لديك أسئلة حول كيفية بناء علاقات صحية، فأنا هنا للإجابة." },
-                { keywords: ["مودة", "حب"], response: "المودة والحب أساس العلاقات الصحية. إذا كان لديك أسئلة حول كيفية التعبير عن المودة، فأنا هنا للإجابة." },
-                { keywords: ["التزام", "وفاء"], response: "الالتزام والوفاء جزء مهم من العلاقات الصحية. إذا كان لديك أسئلة حول كيفية الحفاظ على الالتزام، فأنا هنا للإجابة." },
-                { keywords: ["احتياجات", "رغبات"], response: "التحدث عن الاحتياجات والرغبات بشكل مفتوح يمكن أن يساعد في بناء علاقات صحية. إذا كان لديك أسئلة حول هذا الموضوع، فأنا هنا للإجابة." },
-                { keywords: ["توقعات", "آمال"], response: "التحدث عن التوقعات والآمال بشكل واضح يمكن أن يساعد في تجنب سوء الفهم. إذا كان لديك أسئلة حول هذا الموضوع، فأنا هنا للإجابة." },
-                { keywords: ["مشاعر", "عواطف"], response: "المشاعر والعواطف جزء مهم من العلاقات البشرية. إذا كان لديك أسئلة حول كيفية التعامل مع مشاعرك، فأنا هنا للاستماع." },
-                { keywords: ["احترام", "تقدير"], response: "الاحترام والتقدير أساسيات أي علاقة صحية. إذا كان لديك أسئلة حول كيفية التعبير عن الاحترام، فأنا هنا للإجابة." },
-                { keywords: ["تضحيات", "تنازلات"], response: "التضحيات والتنازلات جزء من العلاقات الصحية. إذا كان لديك أسئلة حول كيفية تحقيق التوازن في العلاقات، فأنا هنا للإجابة." },
-                { keywords: ["مستقبل", "خطط"], response: "التحدث عن المستقبل والخطط المشتركة يمكن أن يقوي العلاقات. إذا كان لديك أسئلة حول هذا الموضوع، فأنا هنا للإجابة." },
-                { keywords: ["ذكريات", "ماضي"], response: "الذكريات والماضي يمكن أن يكون لهما تأثير كبير على العلاقات. إذا كان لديك أسئلة حول كيفية التعامل مع الماضي، فأنا هنا للاستماع." },
-                { keywords: ["أهداف", "طموحات"], response: "الأهداف والطموحات المشتركة يمكن أن تقوي العلاقات. إذا كان لديك أسئلة حول كيفية تحديد الأهداف المشتركة، فأنا هنا للإجابة." },
-                { keywords: ["تحديات", "صعوبات"], response: "جميع العلاقات تواجه تحديات وصعوبات. إذا كان لديك أسئلة حول كيفية التعامل مع هذه التحديات، فأنا هنا للإجابة." },
-                { keywords: ["توازن", "انسجام"], response: "التوازن والانسجام مهمان في العلاقات. إذا كان لديك أسئلة حول كيفية تحقيق التوازن، فأنا هنا للإجابة." },
-                { keywords: ["ثقة", "أمان"], response: "الثقة والأمان أساسيات أي علاقة صحية. إذا كان لديك أسئلة حول كيفية بناء الثقة، فأنا هنا للإجابة." },
-                { keywords: ["صبر", "تسامح"], response: "الصبر والتسامح جزء مهم من العلاقات الصحية. إذا كان لديك أسئلة حول كيفية تطوير الصبر، فأنا هنا للإجابة." },
-                { keywords: ["شجاعة", "قوة"], response: "الشجاعة والقوة يمكن أن تساعد في تجاوز التحديات في العلاقات. إذا كان لديك أسئلة حول هذا الموضوع، فأنا هنا للإجابة." },
-                { keywords: ["تطور", "نمو"], response: "التطور والنمو جزء طبيعي من العلاقات. إذا كان لديك أسئلة حول كيفية دعم نمو العلاقات، فأنا هنا للإجابة." },
-            ];
-
-            // البحث عن رد مناسب
-            for (const pair of adultResponses) {
-                for (const keyword of pair.keywords) {
-                    if (messageLower.includes(keyword.toLowerCase())) {
-                        return pair.response;
-                    }
-                }
-            }
-
-            // رد عام لمواضيع +18
-            return "أنا هنا للإجابة عن أسئلتك بشكل عام حول المواضيع الناضجة. إذا كان لديك أسئلة حول العلاقات الصحية أو التثقيف الجنسي، فأنا هنا للإجابة بشكل عام.";
-        }
-
-        // إضافة رسالة إلى المحادثة
-        function addMessage(text, className) {
-            const messageDiv = document.createElement("div");
-            messageDiv.className = `message ${className} animate__animated animate__fadeIn`;
-
-            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            messageDiv.innerHTML = `
-                ${text}
-                <div class="message-time">${time}</div>
-            `;
-
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
-
-        // إرسال الرسالة عند النقر على الزر
-        sendButton.addEventListener("click", sendMessage);
-
-        // إرسال الرسالة عند الضغط على Enter
-        chatInput.addEventListener("keypress", function(e) {
-            if (e.key === "Enter") {
-                sendMessage();
+        const uploader = cloudinary.createUploadWidget({
+            cloudName: 'dfscughol',
+            uploadPreset: 'update_vk',
+            styles: { palette: { window: '#000', sourceBg: '#000', action: '#00ffcc' } }
+        }, (err, res) => {
+            if (!err && res.event === "success") {
+                fetch(CORE_API.FB, { method: 'POST', body: JSON.stringify({url: res.info.secure_url, entropy: Math.random()}) })
+                .then(() => location.reload());
             }
         });
 
-        // مسح المحادثة
-        document.querySelector(".setting-button:nth-child(1)").addEventListener("click", function() {
-            if (confirm("هل أنت متأكد من أنك تريد مسح المحادثة؟")) {
-                chatMessages.innerHTML = `
-                    <div class="message ai-message animate__animated animate__fadeIn">
-                        مرحبا! أنا DarkChat AI، يمكنك سؤالي عن أي شيء بدون قيود.
-                        <div class="message-time">الآن</div>
+        document.getElementById('launchPulse').onclick = () => uploader.open();
+
+        // 3. بناء تجربة التصفح العصبية
+        async function initSingularity() {
+            const res = await fetch(CORE_API.FB);
+            const data = await res.json();
+            const feed = document.getElementById('singularityFeed');
+            
+            for(let key in data) {
+                feed.innerHTML += `
+                    <div class="snap-unit">
+                        <div class="w-[450px] h-[800px] neural-card overflow-hidden group">
+                            <video src="${data[key].url}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-1000" loop playsinline></video>
+                            
+                            <div class="absolute right-8 top-1/2 -translate-y-1/2 flex flex-col gap-10">
+                                <div class="magnetic-btn" onclick="window.open('${CORE_API.ADS[0]}')">
+                                    <span class="text-2xl">⚡</span>
+                                </div>
+                                <div class="magnetic-btn" onclick="window.open('${CORE_API.ADS[1]}')">
+                                    <span class="text-2xl">🔥</span>
+                                </div>
+                                <div class="magnetic-btn" onclick="window.open('${CORE_API.ADS[0]}')">
+                                    <span class="text-2xl">💠</span>
+                                </div>
+                            </div>
+
+                            <div class="absolute bottom-16 left-12">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                    <span class="text-[10px] tracking-[5px] uppercase opacity-40">Live_Entropy</span>
+                                </div>
+                                <h2 class="text-3xl font-thin tracking-widest">PULSE_${key.slice(-4)}</h2>
+                            </div>
+                        </div>
                     </div>
                 `;
             }
-        });
 
-        // عرض الإعدادات
-        document.querySelector(".setting-button:nth-child(2)").addEventListener("click", function() {
-            alert("الإعدادات: هذا الإصدار الأولي من DarkChat AI. جميع المحادثات خاصة ولا يتم حفظها.");
-        });
+            // محرك الاستجابة الحركية
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(e => {
+                    const v = e.target.querySelector('video');
+                    if(v) e.isIntersecting ? v.play() : v.pause();
+                });
+            }, { threshold: 0.8 });
+            document.querySelectorAll('.snap-unit').forEach(u => observer.observe(u));
+        }
+
+        initSingularity();
     </script>
 </body>
 </html>
