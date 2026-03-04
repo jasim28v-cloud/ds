@@ -14,7 +14,7 @@
         
         :root { --primary: #ffcc00; --bg: #050505; }
         
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
 
         body, html { 
             background: var(--bg); 
@@ -25,9 +25,10 @@
             height: 100vh; 
             overflow: hidden; 
             width: 100vw;
+            position: fixed;
         }
 
-        /* حاوية التمرير العمودي (مثل تيك توك) */
+        /* نظام التمرير العمودي الكامل */
         .video-container {
             height: 100vh;
             width: 100vw;
@@ -35,6 +36,7 @@
             scroll-snap-type: y mandatory;
             scrollbar-width: none;
             position: relative;
+            z-index: 1;
         }
         .video-container::-webkit-scrollbar { display: none; }
 
@@ -55,14 +57,14 @@
             object-fit: cover;
         }
 
-        /* واجهة المستخدم العائمة */
+        /* الواجهة الأمامية للفيديو */
         .ui-overlay {
             position: absolute;
-            bottom: 80px;
+            bottom: 100px;
             left: 0;
             right: 0;
             padding: 20px;
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
             pointer-events: none;
             z-index: 10;
         }
@@ -70,129 +72,145 @@
         .side-actions {
             position: absolute;
             right: 15px;
-            bottom: 120px;
+            bottom: 160px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 22px;
             z-index: 20;
             align-items: center;
         }
 
-        .action-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
         .icon-circle {
-            width: 50px;
-            height: 50px;
+            width: 52px;
+            height: 52px;
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
+            font-size: 24px;
             color: white;
-            border: 1px solid rgba(255, 204, 0, 0.3);
-            margin-bottom: 5px;
-            transition: 0.2s;
+            border: 1.5px solid rgba(255, 204, 0, 0.4);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .icon-circle:active { transform: scale(0.9); background: var(--primary); color: #000; }
+        .icon-circle:active { transform: scale(0.8) rotate(-10deg); background: var(--primary); color: #000; }
+        .action-label { font-size: 11px; font-weight: 900; margin-top: 4px; text-shadow: 1px 1px 3px #000; }
 
-        .action-label { font-size: 12px; font-weight: bold; text-shadow: 1px 1px 2px #000; }
-
-        /* التنقل العلوي */
-        .top-nav {
+        /* منطقة التنقل والدردشة العلوية */
+        .top-interface {
             position: fixed;
             top: 0;
             width: 100%;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            padding: 10px 15px;
             z-index: 100;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+            background: linear-gradient(to bottom, rgba(0,0,0,0.95), rgba(0,0,0,0.4), transparent);
         }
 
-        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--primary); font-size: 1.4rem; letter-spacing: 2px; }
+        .nav-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--primary); font-size: 1.3rem; letter-spacing: 1px; }
 
-        /* زر الرفع المركزي */
-        .bottom-nav {
+        .global-chat-box {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            padding: 10px;
+            height: 75px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 204, 0, 0.2);
+            font-size: 12px;
+            scrollbar-width: none;
+            mask-image: linear-gradient(to bottom, transparent, black 20%, black 80%, transparent);
+        }
+        .global-chat-box::-webkit-scrollbar { display: none; }
+        .chat-entry { margin-bottom: 6px; animation: slideIn 0.3s ease-out; border-right: 3px solid var(--primary); padding-right: 8px; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* شريط التحكم السفلي */
+        .bottom-bar {
             position: fixed;
             bottom: 0;
             width: 100%;
-            height: 60px;
-            background: rgba(0,0,0,0.8);
+            height: 65px;
+            background: rgba(0,0,0,0.95);
             display: flex;
-            justify-content: center;
+            justify-content: space-around;
             align-items: center;
             z-index: 100;
             border-top: 1px solid rgba(255, 204, 0, 0.2);
+            padding-bottom: 10px;
         }
 
-        .upload-trigger {
+        .nav-icon { font-size: 20px; color: rgba(255,255,255,0.6); cursor: pointer; }
+        .nav-icon.active { color: var(--primary); }
+
+        .upload-btn {
             background: var(--primary);
             color: #000;
-            width: 50px;
-            height: 35px;
-            border-radius: 10px;
+            width: 45px;
+            height: 32px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 18px;
-            box-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
-            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 204, 0, 0.3);
         }
 
-        .user-tag { color: var(--primary); font-family: 'Orbitron'; font-size: 14px; font-weight: 900; margin-bottom: 8px; }
-        .video-desc { font-size: 13px; font-weight: 400; max-width: 80%; line-height: 1.4; }
+        .user-tag { color: var(--primary); font-family: 'Orbitron'; font-size: 15px; font-weight: 900; margin-bottom: 4px; }
+        .video-caption { font-size: 13px; color: #ddd; max-width: 85%; }
 
-        /* اخفاء التعليقات تماماً كما طلبت */
-        #mini-chat, .comment-section { display: none !important; }
+        /* تعطيل التفاعل مع أي عناصر تعليقات قديمة */
+        .comment-btn, .comments-container { display: none !important; }
     </style>
 </head>
 <body>
 
-    <nav class="top-nav">
-        <div class="logo">SHΔDØW</div>
-        <div class="text-[10px] bg-white/10 px-3 py-1 rounded-full border border-yellow-500/50" id="user-id">ID: ---</div>
-    </nav>
+    <div class="top-interface">
+        <div class="nav-header">
+            <div class="logo">SHΔDØW</div>
+            <div class="text-[10px] bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded-md border border-yellow-500/30" id="user-id">CONNECTING...</div>
+        </div>
+        <div class="global-chat-box" id="main-chat-flow">
+            </div>
+    </div>
 
     <div class="video-container" id="feed-container">
         </div>
 
-    <div class="bottom-nav">
-        <div class="upload-trigger" id="mega-upload">
+    <div class="bottom-bar">
+        <i class="fas fa-home nav-icon active" onclick="openAd()"></i>
+        <i class="fas fa-search nav-icon" onclick="openAd()"></i>
+        <div class="upload-btn" id="trigger-upload">
             <i class="fas fa-plus"></i>
         </div>
+        <i class="fas fa-bell nav-icon" onclick="openAd()"></i>
+        <i class="fas fa-user nav-icon" onclick="openAd()"></i>
     </div>
 
     <script>
-        const SHADOW_ID = localStorage.getItem('shadow_uid') || 'TITAN_' + Math.random().toString(36).substr(2, 5).toUpperCase();
+        // تفعيل الهوية
+        const SHADOW_ID = localStorage.getItem('shadow_uid') || 'SHD_' + Math.random().toString(36).substr(2, 4).toUpperCase();
         localStorage.setItem('shadow_uid', SHADOW_ID);
         document.getElementById('user-id').innerText = `ID: ${SHADOW_ID}`;
 
+        // إعداد Firebase
         const firebaseConfig = { databaseURL: "https://project-717e4-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // نظام الإعلانات
         const AD_LINKS = [
             "https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e",
             "https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c"
         ];
-        let adToggle = 0;
-        function openAd() {
-            window.open(AD_LINKS[adToggle], '_blank');
-            adToggle = (adToggle + 1) % AD_LINKS.length;
-        }
+        let adCount = 0;
+        function openAd() { window.open(AD_LINKS[adCount % 2], '_blank'); adCount++; }
 
+        // نظام الرفع
         const CLOUD_NAME = "dssk5tabb", UPLOAD_PRESET = "bjebvo5p";
-        const myWidget = cloudinary.createUploadWidget({ cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET }, (err, res) => {
+        const widget = cloudinary.createUploadWidget({ cloudName: CLOUD_NAME, uploadPreset: UPLOAD_PRESET }, (err, res) => {
             if (!err && res.event === "success") {
                 db.ref('videos/').push({ 
                     url: res.info.secure_url, 
@@ -203,8 +221,9 @@
                 openAd();
             }
         });
-        document.getElementById("mega-upload").onclick = () => { openAd(); myWidget.open(); };
+        document.getElementById("trigger-upload").onclick = () => { openAd(); widget.open(); };
 
+        // جلب الفيديوهات وتحديث الواجهة
         db.ref('videos').on('value', (snapshot) => {
             const container = document.getElementById('feed-container');
             const data = snapshot.val();
@@ -216,63 +235,69 @@
                 const section = document.createElement('div');
                 section.className = 'video-scroll-item';
                 section.innerHTML = `
-                    <video loop playsinline src="${vid.url}" onclick="togglePlay(this)"></video>
+                    <video loop playsinline preload="auto" src="${vid.url}" onclick="playPause(this)"></video>
                     <div class="side-actions">
-                        <div class="action-btn" onclick="toggleLike('${id}')">
+                        <div class="action-btn" onclick="handleLike('${id}')">
                             <div class="icon-circle"><i class="fas fa-heart"></i></div>
                             <span class="action-label">${vid.likes || 0}</span>
                         </div>
                         <div class="action-btn" onclick="openAd()">
                             <div class="icon-circle"><i class="fas fa-share"></i></div>
-                            <span class="action-label">نشر</span>
+                            <span class="action-label">SHARE</span>
                         </div>
                         <div class="action-btn" onclick="openAd()">
-                            <div class="icon-circle"><i class="fas fa-bolt"></i></div>
-                            <span class="action-label">VIP</span>
+                            <div class="icon-circle"><i class="fas fa-ellipsis"></i></div>
                         </div>
                     </div>
                     <div class="ui-overlay">
                         <div class="user-tag">@${vid.sender}</div>
-                        <div class="video-desc">نظام التشغيل SHΔDØW V99 - تم تعطيل التعليقات بنجاح.</div>
+                        <div class="video-caption">SHΔDØW TITAN OS v99 | تم تعطيل التعليقات في هذا الوضع.</div>
                     </div>
                 `;
                 container.appendChild(section);
             });
-            initObserver();
+            startObserver();
         });
 
-        function togglePlay(v) {
-            if (v.paused) { v.play(); } else { v.pause(); }
-        }
-
-        function toggleLike(id) {
-            openAd();
-            db.ref(`videos/${id}`).transaction(p => { 
-                if(p) p.likes = (p.likes || 0) + 1; 
-                return p; 
+        // جلب الدردشة العلوية (المطلوبة)
+        db.ref('global_chat').limitToLast(15).on('value', s => {
+            const chatBox = document.getElementById('main-chat-flow');
+            chatBox.innerHTML = '';
+            const messages = s.val();
+            if(messages) Object.values(messages).forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'chat-entry';
+                div.innerHTML = `<b style="color:var(--primary)">${m.user}:</b> ${m.text}`;
+                chatBox.appendChild(div);
             });
-        }
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
 
-        function initObserver() {
-            const options = { threshold: 0.7 };
-            const observer = new IntersectionObserver((entries) => {
+        // التحكم في الفيديو
+        function playPause(v) { v.paused ? v.play() : v.pause(); }
+        function handleLike(id) { openAd(); db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); }
+
+        // مراقب التمرير لتشغيل الفيديو الظاهر فقط
+        function startObserver() {
+            const obs = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
-                    const video = entry.target.querySelector('video');
+                    const v = entry.target.querySelector('video');
                     if (entry.isIntersecting) {
-                        video.play().catch(e => console.log("Autoplay blocked"));
+                        v.play().catch(() => {});
                     } else {
-                        video.pause();
-                        video.currentTime = 0;
+                        v.pause();
+                        v.currentTime = 0;
                     }
                 });
-            }, options);
-            document.querySelectorAll('.video-scroll-item').forEach(item => observer.observe(item));
+            }, { threshold: 0.8 });
+            document.querySelectorAll('.video-scroll-item').forEach(i => obs.observe(i));
         }
 
-        // منع التمرير الارتدادي في iOS
-        document.addEventListener('touchmove', function (e) {
-            if (e.target.closest('.video-container')) return;
-            e.preventDefault();
+        // منع الحركات العشوائية في المتصفح
+        document.body.addEventListener('touchmove', (e) => {
+            if (!e.target.closest('.video-container') && !e.target.closest('.global-chat-box')) {
+                e.preventDefault();
+            }
         }, { passive: false });
     </script>
 </body>
