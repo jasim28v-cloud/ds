@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHΔDØW | TITAN V100</title>
+    <title>SHΔDØW | TITAN V101</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -28,14 +28,14 @@
         .header-content { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
         .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--primary); font-size: 1.3rem; }
 
-        /* شريط مدة الفيديو تحت اسم الموقع */
         .progress-container { width: 100%; height: 3px; background: rgba(255,255,255,0.1); position: relative; }
         #video-progress-bar { height: 100%; width: 0%; background: var(--primary); transition: width 0.1s linear; box-shadow: 0 0 10px var(--primary); }
 
-        #admin-panel { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(25px); z-index: 2000; padding: 20px; overflow-y: auto; }
+        /* لوحة التحكم الثابتة */
+        #admin-panel { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); backdrop-filter: blur(25px); z-index: 9999; padding: 20px; overflow-y: auto; }
         .admin-card { background: rgba(255,255,255,0.05); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,204,0,0.1); }
 
-        #chat-modal { display: none; position: fixed; top: 80px; left: 50%; transform: translateX(-50%); width: 85%; height: 280px; background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); z-index: 1000; border: 1px solid var(--primary); border-radius: 20px; padding: 15px; }
+        #chat-modal { display: none; position: fixed; top: 80px; left: 50%; transform: translateX(-50%); width: 85%; height: 280px; background: rgba(0,0,0,0.8); backdrop-filter: blur(20px); z-index: 1000; border: 1px solid var(--primary); border-radius: 20px; padding: 15px; }
 
         .side-actions { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; gap: 20px; z-index: 20; }
         .icon-circle { width: 50px; height: 50px; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid rgba(255,204,0,0.2); }
@@ -62,10 +62,10 @@
 
     <div id="admin-panel">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-black text-yellow-500">ADMIN CONTROL</h2>
-            <i class="fas fa-times text-2xl" onclick="toggleAdmin()"></i>
+            <h2 class="text-xl font-black text-yellow-500 uppercase">Shadow Control</h2>
+            <i class="fas fa-times text-2xl cursor-pointer" onclick="toggleAdmin()"></i>
         </div>
-        <div id="admin-list" class="grid grid-cols-2 gap-3"></div>
+        <div id="admin-list" class="grid grid-cols-2 gap-3 pb-10"></div>
     </div>
 
     <div id="chat-modal">
@@ -82,11 +82,12 @@
         <i class="fas fa-home nav-icon" onclick="location.reload()"></i>
         <i class="fas fa-comments nav-icon" onclick="toggleChat()"></i>
         <div class="upload-btn" id="up-trigger"><i class="fas fa-plus"></i></div>
-        <i class="fas fa-bolt nav-icon" onclick="openAd()"></i>
-        <i class="fas fa-user-crown nav-icon" onclick="toggleAdmin()"></i>
+        <i class="fas fa-share-alt nav-icon" onclick="openAd()"></i>
+        <i class="fas fa-user-shield nav-icon" onclick="toggleAdmin()"></i>
     </div>
 
     <script>
+        // لفتح لوحة التحكم يجب أن يحتوي الـ ID على كلمة GHOST
         const MY_ID = localStorage.getItem('shadow_uid') || 'GHOST_' + Math.random().toString(36).substr(2, 4).toUpperCase();
         localStorage.setItem('shadow_uid', MY_ID);
         document.getElementById('user-id').innerText = MY_ID;
@@ -97,10 +98,11 @@
 
         function openAd() { window.open("https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e", "_blank"); }
 
+        // تم إزالة openAd من عملية الرفع لتكون مباشرة
         const widget = cloudinary.createUploadWidget({ cloudName: "dssk5tabb", uploadPreset: "bjebvo5p" }, (err, res) => {
             if (!err && res.event === "success") {
                 db.ref('videos/').push({ url: res.info.secure_url, sender: MY_ID, likes: 0, time: Date.now() });
-                openAd();
+                alert("تم رفع الفيديو بنجاح!");
             }
         });
         document.getElementById("up-trigger").onclick = () => widget.open();
@@ -115,7 +117,7 @@
 
             Object.keys(data).reverse().forEach(id => {
                 const v = data[id];
-                // Feed Item
+                // Feed
                 const section = document.createElement('div');
                 section.className = 'video-scroll-item';
                 section.innerHTML = `
@@ -131,12 +133,12 @@
                 `;
                 feed.appendChild(section);
 
-                // Admin Item (Fixed Video Display)
+                // Admin (تصحيح ظهور الفيديوهات)
                 const card = document.createElement('div');
                 card.className = 'admin-card p-2';
                 card.innerHTML = `
-                    <video src="${v.url}" class="h-24 w-full object-cover rounded mb-2"></video>
-                    <button onclick="del('${id}')" class="w-full bg-red-600/80 text-[10px] py-1 rounded">حذف</button>
+                    <video src="${v.url}" class="h-28 w-full object-cover rounded mb-2" muted></video>
+                    <button onclick="del('${id}')" class="w-full bg-red-600 text-[10px] py-1.5 rounded font-bold">حذف الفيديو</button>
                 `;
                 adminList.appendChild(card);
             });
@@ -144,7 +146,8 @@
         });
 
         function updateProgress(video) {
-            if (video.parentElement.getBoundingClientRect().top === 0) {
+            const rect = video.parentElement.getBoundingClientRect();
+            if (rect.top >= -50 && rect.top <= 50) {
                 const bar = document.getElementById('video-progress-bar');
                 const percent = (video.currentTime / video.duration) * 100;
                 bar.style.width = percent + "%";
@@ -164,14 +167,14 @@
         }
 
         function like(id) { openAd(); db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); }
-        function del(id) { if(confirm('متأكد من الحذف؟')) db.ref(`videos/${id}`).remove(); }
+        function del(id) { if(confirm('هل أنت متأكد من حذف هذا الفيديو نهائياً؟')) db.ref(`videos/${id}`).remove(); }
         function toggleChat() { const c = document.getElementById('chat-modal'); c.style.display = c.style.display === 'block' ? 'none' : 'block'; }
         
         function toggleAdmin() {
             if(MY_ID.includes("GHOST")) {
                 const p = document.getElementById('admin-panel');
-                p.style.display = p.style.display === 'block' ? 'none' : 'block';
-            } else { alert("قسم خاص بالمسؤول فقط"); }
+                p.style.display = (p.style.display === 'none' || p.style.display === '') ? 'block' : 'none';
+            } else { alert("هذه اللوحة مخصصة للمسؤول فقط."); }
         }
 
         function sendMsg() {
@@ -189,9 +192,9 @@
             const obs = new IntersectionObserver((es) => {
                 es.forEach(e => {
                     const v = e.target.querySelector('video');
-                    if(e.isIntersecting) { v.play(); } else { v.pause(); v.currentTime = 0; }
+                    if(e.isIntersecting) { v.play().catch(()=>{}); } else { v.pause(); v.currentTime = 0; }
                 });
-            }, { threshold: 0.8 });
+            }, { threshold: 0.7 });
             document.querySelectorAll('.video-scroll-item').forEach(i => obs.observe(i));
         }
     </script>
