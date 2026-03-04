@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHΔDØW | PINK TITAN PRO</title>
+    <title>SHΔDØW | PURPLE TITAN ROYAL</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Cairo:wght@300;900&display=swap');
-        :root { --primary: #ff2d75; --bg: #000; }
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Cairo:wght@300;900&family=Playfair+Display:ital@1&display=swap');
+        :root { --primary: #bc13fe; --bg: #000; }
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body, html { background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; width: 100vw; position: fixed; }
 
@@ -20,13 +20,18 @@
         .video-scroll-item { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
+        /* العلامة المائية الفخمة */
+        .watermark { position: absolute; top: 10%; right: 20px; opacity: 0.25; pointer-events: none; z-index: 50; font-family: 'Playfair Display', serif; font-size: 16px; font-style: italic; color: rgba(255,255,255,0.7); letter-spacing: 1px; text-shadow: 1px 1px 3px rgba(0,0,0,0.8); }
+
         .top-interface { 
             position: fixed; top: 0; width: 100%; z-index: 100; 
-            background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px); 
-            border-bottom: 1px solid rgba(255, 45, 117, 0.3);
+            background: rgba(0, 0, 0, 0.25); backdrop-filter: blur(12px); 
+            border-bottom: 1px solid rgba(188, 19, 254, 0.3);
         }
         .header-content { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--primary); font-size: 1.3rem; text-shadow: 0 0 15px rgba(255,45,117,0.6); }
+        .logo-area { display: flex; align-items: center; gap: 15px; }
+        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--primary); font-size: 1.3rem; text-shadow: 0 0 15px rgba(188,19,254,0.6); }
+        .digital-clock { font-family: 'Orbitron', sans-serif; font-size: 12px; color: rgba(255,255,255,0.7); letter-spacing: 1px; }
 
         .progress-container { width: 100%; height: 3px; background: rgba(255,255,255,0.1); position: relative; }
         #video-progress-bar { height: 100%; width: 0%; background: var(--primary); box-shadow: 0 0 10px var(--primary); transition: width 0.1s linear; }
@@ -34,18 +39,18 @@
         #admin-panel { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); backdrop-filter: blur(25px); z-index: 9999; padding: 20px; overflow-y: auto; }
         .admin-card { background: rgba(255,255,255,0.05); border-radius: 12px; overflow: hidden; border: 1px solid var(--primary); }
 
-        #chat-modal { display: none; position: fixed; top: 80px; left: 50%; transform: translateX(-50%); width: 85%; height: 280px; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 1000; border: 1px solid var(--primary); border-radius: 20px; padding: 15px; box-shadow: 0 0 20px rgba(255,45,117,0.2); }
+        #chat-modal { display: none; position: fixed; top: 80px; left: 50%; transform: translateX(-50%); width: 85%; height: 280px; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); z-index: 1000; border: 1px solid var(--primary); border-radius: 20px; padding: 15px; box-shadow: 0 0 20px rgba(188,19,254,0.2); }
 
         .side-actions { position: absolute; right: 12px; bottom: 120px; display: flex; flex-direction: column; gap: 15px; z-index: 20; align-items: center; }
-        .icon-circle { width: 48px; height: 48px; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; border: 1px solid rgba(255,45,117,0.4); color: white; transition: 0.3s; }
-        .icon-circle.active-pink { color: var(--primary); border-color: var(--primary); box-shadow: 0 0 10px var(--primary); }
+        .icon-circle { width: 48px; height: 48px; background: rgba(0,0,0,0.4); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; border: 1px solid rgba(188,19,254,0.4); color: white; transition: 0.3s; }
+        .icon-circle.active-purple { color: var(--primary); border-color: var(--primary); box-shadow: 0 0 10px var(--primary); }
 
-        .bottom-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.5); backdrop-filter: blur(15px); display: flex; justify-content: space-around; align-items: center; z-index: 100; border-top: 1px solid rgba(255,45,117,0.2); }
+        .bottom-bar { position: fixed; bottom: 0; width: 100%; height: 60px; background: rgba(0,0,0,0.5); backdrop-filter: blur(15px); display: flex; justify-content: space-around; align-items: center; z-index: 100; border-top: 1px solid rgba(188,19,254,0.2); }
         .nav-icon { font-size: 20px; color: rgba(255,255,255,0.5); }
         .nav-icon.active { color: var(--primary); text-shadow: 0 0 10px var(--primary); }
-        .upload-btn { background: var(--primary); color: #fff; width: 46px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 0 15px rgba(255,45,117,0.5); }
+        .upload-btn { background: var(--primary); color: #fff; width: 46px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 0 15px rgba(188,19,254,0.5); }
 
-        .heart-pop { position: absolute; font-size: 80px; color: var(--primary); pointer-events: none; z-index: 1000; animation: heartFade 0.8s ease-out forwards; text-shadow: 0 0 20px rgba(255,45,117,0.8); }
+        .heart-pop { position: absolute; font-size: 80px; color: var(--primary); pointer-events: none; z-index: 1000; animation: heartFade 0.8s ease-out forwards; text-shadow: 0 0 20px rgba(188,19,254,0.8); }
         @keyframes heartFade { 0% { opacity:0; transform: scale(0.5); } 50% { opacity:1; } 100% { opacity:0; transform: scale(1.8); } }
     </style>
 </head>
@@ -53,8 +58,11 @@
 
     <div class="top-interface">
         <div class="header-content">
-            <div class="logo">SHΔDØW</div>
-            <div class="text-[10px] text-pink-500 font-bold" id="user-id">---</div>
+            <div class="logo-area">
+                <div class="logo">SHΔDØW</div>
+                <div class="digital-clock" id="clock">00:00:00</div>
+            </div>
+            <div class="text-[10px] text-purple-400 font-bold" id="user-id">---</div>
         </div>
         <div class="progress-container">
             <div id="video-progress-bar"></div>
@@ -63,7 +71,7 @@
 
     <div id="admin-panel">
         <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-black text-pink-500 uppercase">Pink Control Panel</h2>
+            <h2 class="text-xl font-black text-purple-400 uppercase">Purple Control Panel</h2>
             <i class="fas fa-times text-2xl cursor-pointer" onclick="toggleAdmin()"></i>
         </div>
         <div id="admin-list" class="grid grid-cols-2 gap-3 pb-10"></div>
@@ -72,8 +80,8 @@
     <div id="chat-modal">
         <div id="chat-flow" class="h-44 overflow-y-auto text-[11px] mb-3 space-y-2"></div>
         <div class="flex gap-2">
-            <input type="text" id="chat-in" class="flex-1 bg-white/10 rounded-full px-4 text-[11px] h-8 text-white focus:outline-none border border-pink-900 focus:border-pink-500" placeholder="اكتب بالزهري...">
-            <button onclick="sendMsg()" class="text-pink-500 px-2"><i class="fas fa-paper-plane"></i></button>
+            <input type="text" id="chat-in" class="flex-1 bg-white/10 rounded-full px-4 text-[11px] h-8 text-white focus:outline-none border border-purple-900 focus:border-purple-500" placeholder="اكتب بالبنفسجي...">
+            <button onclick="sendMsg()" class="text-purple-500 px-2"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
@@ -98,7 +106,7 @@
 
         function openAd() { window.open("https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e", "_blank"); }
 
-        // إعداد واجهة الرفع الزهرية
+        // إعداد واجهة الرفع البنفسجية
         const widget = cloudinary.createUploadWidget({ 
             cloudName: "dssk5tabb", 
             uploadPreset: "bjebvo5p",
@@ -106,13 +114,13 @@
                 palette: {
                     window: "#000000",
                     sourceBg: "#000000",
-                    windowBorder: "#ff2d75",
-                    tabIcon: "#ff2d75",
+                    windowBorder: "#bc13fe",
+                    tabIcon: "#bc13fe",
                     inactiveTabIcon: "#555555",
-                    menuIcons: "#ff2d75",
-                    link: "#ff2d75",
-                    action: "#ff2d75",
-                    inProgress: "#ff2d75",
+                    menuIcons: "#bc13fe",
+                    link: "#bc13fe",
+                    action: "#bc13fe",
+                    inProgress: "#bc13fe",
                     complete: "#20ff80",
                     error: "#ff0033",
                     textDark: "#000000",
@@ -122,7 +130,7 @@
         }, (err, res) => {
             if (!err && res.event === "success") {
                 db.ref('videos/').push({ url: res.info.secure_url, sender: MY_ID, likes: 0, time: Date.now() });
-                alert("تم رفع فيديو زهري جديد! ✨");
+                alert("تم رفع فيديو بنفسجي ملكي جديد! ✨");
             }
         });
         document.getElementById("up-trigger").onclick = () => widget.open();
@@ -140,7 +148,7 @@
                 const section = document.createElement('div');
                 section.className = 'video-scroll-item';
                 section.innerHTML = `
-                    <div class="absolute top-1/3 left-5 opacity-10 pointer-events-none z-50 text-[10px] tracking-widest text-pink-400 rotate-90">SHΔDØW PRO</div>
+                    <div class="watermark">SHΔDØW ROYAL</div>
                     <video loop playsinline src="${v.url}" ontimeupdate="updateProgress(this)" onclick="handleVideo(event, '${id}')"></video>
                     <div class="side-actions">
                         <div class="icon-circle mb-1" onclick="toggleMute(event, '${id}')" id="mute-${id}">
@@ -148,9 +156,9 @@
                         </div>
                         <div class="action-btn text-center" onclick="like('${id}')">
                             <div class="icon-circle"><i class="fas fa-heart"></i></div>
-                            <span class="text-[10px] font-bold mt-1 text-pink-400">${v.likes || 0}</span>
+                            <span class="text-[10px] font-bold mt-1 text-purple-300">${v.likes || 0}</span>
                         </div>
-                        <div class="icon-circle" onclick="openAd()"><i class="fas fa-share"></i></div>
+                        <div class="icon-circle" onclick="openAd()"><i class="fas fa-share text-white"></i></div>
                     </div>
                 `;
                 feed.appendChild(section);
@@ -159,7 +167,7 @@
                 card.className = 'admin-card p-2';
                 card.innerHTML = `
                     <video src="${v.url}" class="h-28 w-full object-cover rounded mb-2" muted></video>
-                    <button onclick="del('${id}')" class="w-full bg-pink-600 text-[10px] py-2 rounded font-black uppercase">Delete</button>
+                    <button onclick="del('${id}')" class="w-full bg-purple-600 text-[10px] py-2 rounded font-black uppercase">Delete</button>
                 `;
                 adminList.appendChild(card);
             });
@@ -181,7 +189,7 @@
             const icon = e.currentTarget.querySelector('i');
             video.muted = !video.muted;
             icon.className = video.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
-            e.currentTarget.classList.toggle('active-pink', !video.muted);
+            e.currentTarget.classList.toggle('active-purple', !video.muted);
         }
 
         let lastT = 0;
@@ -214,7 +222,7 @@
 
         db.ref('global_chat').limitToLast(20).on('value', s => {
             const flow = document.getElementById('chat-flow'); flow.innerHTML = '';
-            s.forEach(c => { const m = c.val(); flow.innerHTML += `<div><b class="text-pink-500">${m.u}:</b> <span class="text-gray-300">${m.t}</span></div>`; });
+            s.forEach(c => { const m = c.val(); flow.innerHTML += `<div><b class="text-purple-500">${m.u}:</b> <span class="text-gray-300">${m.t}</span></div>`; });
             flow.scrollTop = flow.scrollHeight;
         });
 
@@ -227,6 +235,17 @@
             }, { threshold: 0.7 });
             document.querySelectorAll('.video-scroll-item').forEach(i => obs.observe(i));
         }
+
+        // تحديث الساعة الرقمية
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock(); // التحديث الأولي
     </script>
 </body>
 </html>
