@@ -22,9 +22,10 @@
         .digital-clock { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: 900; color: var(--neon-color); text-shadow: 0 0 15px var(--neon-color); letter-spacing: 1px; }
         .center-side-controls { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 25px; z-index: 100; align-items: center; }
         .control-btn { width: 50px; height: 50px; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; cursor: pointer; }
-        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; height: 70px; border-radius: 25px; display: flex; justify-content: space-around; align-items: center; z-index: 500; border: 1px solid var(--neon-color); }
+        .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 420px; height: 70px; border-radius: 25px; display: flex; justify-content: space-around; align-items: center; z-index: 500; border: 1px solid var(--neon-color); }
         .upload-main { width: 55px; height: 55px; background: var(--neon-color); color: #000; border-radius: 20px; display: flex; align-items: center; justify-content: center; transform: translateY(-10px); box-shadow: 0 0 20px var(--neon-color); cursor: pointer; }
-        #admin-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 1000; padding: 20px; overflow-y: auto; }
+        #admin-overlay, #chat-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 1000; padding: 20px; overflow-y: auto; }
+        #chat-overlay { flex-direction: column; }
         .admin-video-card { background: #111; border-radius: 15px; overflow: hidden; border: 1px solid #333; position: relative; height: 180px; }
         .heart-animation { position: absolute; font-size: 80px; color: var(--neon-color); pointer-events: none; z-index: 1000; animation: heartFade 0.8s ease-out forwards; text-shadow: 0 0 20px var(--neon-color); }
         @keyframes heartFade { 0% { transform: scale(0) rotate(-15deg); opacity: 0; } 50% { transform: scale(1.2) rotate(10deg); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
@@ -40,10 +41,21 @@
     <main class="scroll-engine" id="video-stack"></main>
 
     <nav class="bottom-nav glass-ui">
-        <div class="nav-item cursor-pointer" onclick="location.reload()"><i class="fas fa-home opacity-50 text-xl"></i></div>
-        <div class="nav-item cursor-pointer" onclick="toggleAdmin()"><i class="fas fa-user-shield opacity-50 text-xl"></i></div>
-        <div id="upload-trigger" class="upload-main"><i class="fas fa-plus text-xl"></i></div>
-        <div class="nav-item cursor-pointer" onclick="shareWithAd()"><i class="fas fa-share-alt opacity-50 text-xl"></i></div>
+        <div class="nav-item cursor-pointer text-center" onclick="location.reload()">
+            <i class="fas fa-home opacity-50 text-xl"></i>
+        </div>
+        <div class="nav-item cursor-pointer text-center" onclick="toggleChat()">
+            <i class="fas fa-comment-dots opacity-50 text-xl"></i>
+        </div>
+        <div id="upload-trigger" class="upload-main">
+            <i class="fas fa-plus text-xl"></i>
+        </div>
+        <div class="nav-item cursor-pointer text-center" onclick="toggleAdmin()">
+            <i class="fas fa-user-shield opacity-50 text-xl"></i>
+        </div>
+        <div class="nav-item cursor-pointer text-center" onclick="shareWithAd()">
+            <i class="fas fa-share-alt opacity-50 text-xl"></i>
+        </div>
     </nav>
 
     <div id="admin-overlay">
@@ -52,6 +64,18 @@
             <i class="fas fa-times text-2xl cursor-pointer" onclick="toggleAdmin()"></i>
         </div>
         <div id="admin-grid" class="grid grid-cols-2 gap-4 pb-24"></div>
+    </div>
+
+    <div id="chat-overlay" class="flex flex-col">
+        <div class="p-5 border-b border-white/10 flex justify-between items-center sticky top-0 bg-black/90 z-50">
+            <span style="color: var(--neon-color)" class="font-[Orbitron]">ENCRYPTED_STREAM</span>
+            <i class="fas fa-times text-xl cursor-pointer" onclick="toggleChat()"></i>
+        </div>
+        <div id="chat-box" class="flex-1 p-5 overflow-y-auto space-y-4 pb-32"></div>
+        <div class="fixed bottom-0 left-0 w-full p-6 bg-black/90 border-t border-white/10 flex gap-2">
+            <input type="text" id="msg-input" class="flex-1 bg-white/5 p-4 rounded-2xl border border-white/10 text-sm outline-none" placeholder="اكتب رسالة مشفرة...">
+            <button onclick="sendChat()" class="p-2"><i class="fas fa-paper-plane text-xl" style="color: var(--neon-color)"></i></button>
+        </div>
     </div>
 
     <script>
@@ -101,15 +125,14 @@
                 `;
                 container.appendChild(section);
 
-                const card = document.createElement('div');
-                card.className = 'admin-video-card';
-                card.innerHTML = `
-                    <video src="${vid.url}" class="w-full h-full object-cover" muted></video>
-                    <div class="absolute inset-0 bg-black/60 flex items-center justify-center p-2">
-                        <button onclick="deleteVid('${id}')" class="bg-red-600 text-white px-4 py-1 rounded-full text-[10px] font-bold">DELETE</button>
+                adminGrid.innerHTML += `
+                    <div class="admin-video-card">
+                        <video src="${vid.url}" class="w-full h-full object-cover" muted></video>
+                        <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
+                            <button onclick="deleteVid('${id}')" class="bg-red-600 text-white px-4 py-1 rounded-full text-[10px] font-bold">DELETE</button>
+                        </div>
                     </div>
                 `;
-                adminGrid.appendChild(card);
             });
             initScroll();
         });
@@ -137,11 +160,39 @@
             setTimeout(() => h.remove(), 800);
         }
 
+        function toggleChat() { const c = document.getElementById('chat-overlay'); c.style.display = c.style.display === 'flex' ? 'none' : 'flex'; }
+        function toggleAdmin() { const a = document.getElementById('admin-overlay'); a.style.display = a.style.display === 'block' ? 'none' : 'block'; }
+        
+        function sendChat() {
+            const input = document.getElementById('msg-input');
+            if(input.value.trim()){
+                db.ref('global_chat').push({u: SHADOW_ID, t: input.value, ts: Date.now()});
+                input.value = '';
+            }
+        }
+
+        db.ref('global_chat').limitToLast(20).on('value', s => {
+            const box = document.getElementById('chat-box');
+            box.innerHTML = '';
+            s.forEach(m => {
+                const d = m.val();
+                const isMe = d.u === SHADOW_ID;
+                box.innerHTML += `
+                    <div class="flex flex-col ${isMe ? 'items-start' : 'items-end'}">
+                        <span class="text-[8px] opacity-40 mb-1">${d.u}</span>
+                        <div class="p-3 rounded-2xl text-sm ${isMe ? 'bg-cyan-500/10 border-l-2 border-cyan-500' : 'bg-white/5'} max-w-[85%]">
+                            ${d.t}
+                        </div>
+                    </div>
+                `;
+            });
+            box.scrollTop = box.scrollHeight;
+        });
+
         function likeWithAd(id) { openAd(); db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); }
         function muteWithAd(btn) { openAd(); const v = btn.closest('.video-segment').querySelector('video'); v.muted = !v.muted; btn.innerHTML = v.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>'; }
         function shareWithAd() { openAd(); navigator.share({ url: window.location.href }).catch(()=>{}); }
-        function toggleAdmin() { const el = document.getElementById('admin-overlay'); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
-        function deleteVid(id) { if(confirm('حذف هذا الفيديو نهائياً؟')) db.ref(`videos/${id}`).remove(); }
+        function deleteVid(id) { if(confirm('حذف؟')) db.ref(`videos/${id}`).remove(); }
 
         const widget = cloudinary.createUploadWidget({ cloudName: "dssk5tabb", uploadPreset: "bjebvo5p" }, (err, res) => {
             if (!err && res.event === "success") { db.ref('videos/').push({ url: res.info.secure_url, sender: SHADOW_ID, likes: 0, timestamp: Date.now() }); }
