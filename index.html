@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHΔDØW | ORANGE TITAN</title>
+    <title>SHΔDØW | NANO ORANGE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -11,175 +11,164 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Cairo:wght@300;900&display=swap');
-        :root { --primary: #ff6600; --bg: #000; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { background: var(--bg); color: #fff; font-family: 'Cairo', sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; width: 100vw; position: fixed; }
+        :root { --primary: #ff5500; --nano-glow: rgba(255, 85, 0, 0.6); }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body, html { background: #000; color: #fff; font-family: 'Cairo', sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; width: 100vw; position: fixed; }
 
-        .video-container { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; position: relative; z-index: 1; }
+        .video-container { height: 100vh; width: 100vw; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; z-index: 1; }
         .video-container::-webkit-scrollbar { display: none; }
         .video-scroll-item { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; display: flex; align-items: center; justify-content: center; }
         video { width: 100%; height: 100%; object-fit: cover; }
 
-        .top-interface { 
-            position: fixed; top: 0; width: 100%; z-index: 100; 
-            background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); 
-            border-bottom: 1px solid rgba(255, 102, 0, 0.3);
-        }
-        .header-content { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; }
-        .logo-area { display: flex; align-items: center; gap: 15px; }
-        .logo { font-family: 'Orbitron'; font-weight: 900; color: var(--primary); font-size: 1.3rem; text-shadow: 0 0 15px rgba(255,102,0,0.6); }
-        .digital-clock { font-family: 'Orbitron', sans-serif; font-size: 12px; color: rgba(255,255,255,0.7); }
+        /* العلامة المائية الفخمة داخل كل فيديو */
+        .brand-watermark { position: absolute; top: 15%; right: 20px; font-family: 'Orbitron'; font-weight: 900; font-size: 1.5rem; color: rgba(255, 255, 255, 0.15); pointer-events: none; z-index: 10; letter-spacing: 5px; text-transform: uppercase; border-right: 2px solid var(--primary); padding-right: 10px; }
 
-        .progress-container { width: 100%; height: 3px; background: rgba(255,255,255,0.1); position: relative; }
-        #video-progress-bar { height: 100%; width: 0%; background: var(--primary); box-shadow: 0 0 10px var(--primary); transition: width 0.1s linear; }
+        /* واجهة الساعة العلوية */
+        .top-nav { position: fixed; top: 0; width: 100%; z-index: 100; background: linear-gradient(to bottom, rgba(0,0,0,0.6), transparent); padding: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .digital-clock { font-family: 'Orbitron'; color: var(--primary); font-size: 14px; text-shadow: 0 0 10px var(--nano-glow); }
 
-        .side-actions { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 20px; z-index: 20; align-items: center; }
-        .icon-circle { width: 50px; height: 50px; background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; border: 1px solid rgba(255,102,0,0.4); color: white; transition: 0.3s; }
-        .icon-circle.active-orange { color: var(--primary); border-color: var(--primary); box-shadow: 0 0 15px var(--primary); }
+        .progress-bar-container { position: fixed; top: 55px; width: 100%; height: 2px; background: rgba(255,255,255,0.1); z-index: 101; }
+        #nano-progress { height: 100%; width: 0%; background: var(--primary); box-shadow: 0 0 15px var(--primary); transition: width 0.1s linear; }
 
-        .video-info { position: absolute; bottom: 80px; right: 15px; text-align: right; z-index: 20; }
-        .hashtag { color: var(--primary); font-weight: 900; font-size: 14px; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        /* الأزرار الجانبية اليسرى (تفاعل نانوي) */
+        .left-actions { position: absolute; left: 15px; top: 45%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; z-index: 150; align-items: center; }
+        .nano-btn { width: 45px; height: 45px; background: rgba(0,0,0,0.3); backdrop-filter: blur(15px); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(255,85,0,0.2); color: #fff; transition: 0.4s; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .nano-btn:active { transform: scale(0.9); border-color: var(--primary); }
+        .btn-admin { opacity: 0.4; border-style: dashed; font-size: 16px; } /* لوحة التحكم المائية */
 
-        .bottom-bar { position: fixed; bottom: 0; width: 100%; height: 65px; background: rgba(0,0,0,0.7); backdrop-filter: blur(20px); display: flex; justify-content: space-around; align-items: center; z-index: 100; border-top: 1px solid rgba(255,102,0,0.3); }
-        .nav-icon { font-size: 22px; color: rgba(255,255,255,0.6); }
-        .nav-icon.active { color: var(--primary); text-shadow: 0 0 10px var(--primary); }
-        .upload-btn { background: var(--primary); color: #fff; width: 50px; height: 32px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 0 15px rgba(255,102,0,0.4); }
+        /* معلومات الفيديو والهاشتاج */
+        .video-meta { position: absolute; bottom: 90px; right: 15px; text-align: right; z-index: 50; }
+        .nano-hashtag { color: var(--primary); font-weight: 900; font-size: 13px; text-shadow: 0 0 8px var(--nano-glow); letter-spacing: 1px; }
 
-        #admin-panel { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); z-index: 9999; padding: 20px; overflow-y: auto; }
-        .admin-card { background: rgba(255,255,255,0.05); border-radius: 12px; border: 1px solid var(--primary); overflow: hidden; }
+        /* الشريط السفلي النانوي */
+        .nano-bar { position: fixed; bottom: 0; width: 100%; height: 70px; background: rgba(0,0,0,0.6); backdrop-filter: blur(25px); border-top: 1px solid rgba(255,85,0,0.2); display: flex; justify-content: space-around; align-items: center; z-index: 200; }
+        .bar-icon { font-size: 22px; color: rgba(255,255,255,0.4); transition: 0.3s; }
+        .bar-icon.active { color: var(--primary); filter: drop-shadow(0 0 8px var(--primary)); }
+        .center-up { background: var(--primary); color: #fff; width: 50px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px var(--nano-glow); }
 
-        .heart-pop { position: absolute; font-size: 80px; color: var(--primary); pointer-events: none; z-index: 1000; animation: heartFade 0.8s ease-out forwards; }
-        @keyframes heartFade { 0% { opacity:0; transform: scale(0.5); } 50% { opacity:1; } 100% { opacity:0; transform: scale(1.8); } }
+        /* نافذة الدردشة */
+        #chat-modal { display: none; position: fixed; bottom: 85px; left: 15px; right: 15px; height: 300px; background: rgba(0,0,0,0.85); backdrop-filter: blur(20px); border-radius: 25px; border: 1px solid var(--primary); z-index: 1000; padding: 15px; }
+
+        /* لوحة التحكم */
+        #admin-panel { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 2000; padding: 25px; overflow-y: auto; }
+
+        .heart-nano { position: absolute; font-size: 80px; color: var(--primary); pointer-events: none; z-index: 1000; animation: glowFade 0.8s ease-out forwards; }
+        @keyframes glowFade { 0% { opacity:0; transform: scale(0.5) rotate(-15deg); filter: blur(5px); } 50% { opacity:1; filter: blur(0); } 100% { opacity:0; transform: scale(1.5) rotate(10deg); } }
     </style>
 </head>
 <body>
 
-    <div class="top-interface">
-        <div class="header-content">
-            <div class="logo-area">
-                <div class="logo">SHΔDØW</div>
-                <div class="digital-clock" id="clock">00:00:00</div>
-            </div>
-            <div class="text-[10px] text-orange-400 font-bold" id="user-id">---</div>
-        </div>
-        <div class="progress-container">
-            <div id="video-progress-bar"></div>
-        </div>
+    <div class="top-nav">
+        <div class="digital-clock" id="nano-clock">00:00:00</div>
+        <div class="text-[9px] font-bold text-orange-600 tracking-tighter" id="user-tag">GHOST_USER</div>
     </div>
+    <div class="progress-bar-container"><div id="nano-progress"></div></div>
 
     <div id="admin-panel">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-xl font-black text-orange-500 uppercase">Orange Control</h2>
-            <i class="fas fa-times text-2xl cursor-pointer" onclick="toggleAdmin()"></i>
-        </div>
-        <div id="admin-list" class="grid grid-cols-2 gap-3 pb-10"></div>
+        <div class="flex justify-between items-center mb-8"><h2 class="text-orange-500 font-black italic">NANO ADMIN</h2><i class="fas fa-times text-2xl" onclick="toggleAdmin()"></i></div>
+        <div id="admin-list" class="grid grid-cols-2 gap-4"></div>
     </div>
 
-    <div class="video-container" id="feed"></div>
+    <div id="chat-modal">
+        <div id="chat-content" class="h-48 overflow-y-auto text-[11px] space-y-3 mb-3 scrollbar-hide"></div>
+        <div class="flex gap-2">
+            <input type="text" id="chat-msg" class="flex-1 bg-white/10 rounded-xl px-4 text-xs border border-orange-900 focus:border-orange-500" placeholder="أرسل نبضة نانوية...">
+            <button onclick="sendMsg()" class="text-orange-500 p-2"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
 
-    <div class="bottom-bar">
-        <i class="fas fa-home nav-icon active" onclick="location.reload()"></i>
-        <i class="fas fa-search nav-icon" onclick="alert('قريباً...')"></i>
-        <div class="upload-btn" id="up-trigger"><i class="fas fa-plus"></i></div>
-        <i class="fas fa-share-alt nav-icon" onclick="realShare()"></i>
-        <i class="fas fa-user-shield nav-icon" onclick="toggleAdmin()"></i>
+    <div class="video-container" id="nano-feed"></div>
+
+    <div class="nano-bar">
+        <i class="fas fa-home bar-icon active" onclick="location.reload()"></i>
+        <div class="center-up" id="btn-up"><i class="fas fa-plus"></i></div>
+        <i class="fas fa-comment-dots bar-icon" onclick="toggleChat()"></i>
+        <i class="fas fa-share-nodes bar-icon" onclick="realShare()"></i>
     </div>
 
     <script>
         const MY_ID = localStorage.getItem('shadow_uid') || 'GHOST_' + Math.random().toString(36).substr(2, 4).toUpperCase();
         localStorage.setItem('shadow_uid', MY_ID);
-        document.getElementById('user-id').innerText = MY_ID;
+        document.getElementById('user-tag').innerText = MY_ID;
 
         const firebaseConfig = { databaseURL: "https://project-717e4-default-rtdb.firebaseio.com/" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
         function realShare() {
-            if (navigator.share) {
-                navigator.share({ title: 'SHΔDØW ORANGE', text: 'شاهد هذا المحتوى الرهيب!', url: window.location.href });
-            } else {
-                alert("رابط الموقع: " + window.location.href);
-            }
+            if (navigator.share) navigator.share({ title: 'SHΔDØW', url: window.location.href });
+            else alert("Link: " + window.location.href);
         }
 
         const widget = cloudinary.createUploadWidget({ 
-            cloudName: "dssk5tabb", 
-            uploadPreset: "bjebvo5p",
-            styles: { palette: { window: "#000", sourceBg: "#000", windowBorder: "#ff6600", tabIcon: "#ff6600", inactiveTabIcon: "#555", menuIcons: "#ff6600", link: "#ff6600", action: "#ff6600", inProgress: "#ff6600", textLight: "#fff" } }
+            cloudName: "dssk5tabb", uploadPreset: "bjebvo5p",
+            styles: { palette: { window: "#000", windowBorder: "#ff5500", tabIcon: "#ff5500", textLight: "#fff" } }
         }, (err, res) => {
             if (!err && res.event === "success") {
                 db.ref('videos/').push({ url: res.info.secure_url, sender: MY_ID, likes: 0, time: Date.now() });
             }
         });
-        document.getElementById("up-trigger").onclick = () => widget.open();
+        document.getElementById("btn-up").onclick = () => widget.open();
 
         db.ref('videos').on('value', (snap) => {
-            const feed = document.getElementById('feed');
+            const feed = document.getElementById('nano-feed');
             const adminList = document.getElementById('admin-list');
             const data = snap.val();
             if(!data) return;
-            feed.innerHTML = '';
-            adminList.innerHTML = '';
+            feed.innerHTML = ''; adminList.innerHTML = '';
 
             Object.keys(data).reverse().forEach(id => {
                 const v = data[id];
-                const section = document.createElement('div');
-                section.className = 'video-scroll-item';
-                section.innerHTML = `
-                    <video loop playsinline src="${v.url}" ontimeupdate="updateProgress(this)" onclick="handleVideo(event, '${id}')"></video>
+                const item = document.createElement('div');
+                item.className = 'video-scroll-item';
+                item.innerHTML = `
+                    <div class="brand-watermark">SHΔDØW</div>
+                    <video loop playsinline src="${v.url}" ontimeupdate="trackProg(this)" onclick="handleVid(event, '${id}')"></video>
                     
-                    <div class="side-actions">
-                        <div class="action-btn text-center" onclick="like('${id}')">
-                            <div class="icon-circle"><i class="fas fa-heart"></i></div>
-                            <span class="text-[10px] font-bold mt-1 text-orange-400">${v.likes || 0}</span>
+                    <div class="left-actions">
+                        <div class="nano-btn btn-admin" onclick="toggleAdmin()"><i class="fas fa-shield-halved"></i></div>
+                        <div class="nano-btn" onclick="like('${id}')">
+                            <i class="fas fa-heart text-white"></i>
+                            <span class="absolute -bottom-5 text-[9px] font-bold text-orange-500">${v.likes || 0}</span>
                         </div>
-                        <div class="icon-circle" onclick="toggleMute(event, '${id}')" id="mute-${id}">
-                            <i class="fas fa-volume-up"></i>
-                        </div>
-                        <div class="icon-circle" onclick="realShare()"><i class="fas fa-paper-plane"></i></div>
+                        <div class="nano-btn" onclick="muteVid(event, '${id}')"><i class="fas fa-volume-up"></i></div>
                     </div>
 
-                    <div class="video-info">
-                        <div class="hashtag">#SHADOW_ORANGE #PRO_VIDEO</div>
-                        <div class="text-[10px] text-white/70 mt-1">بواسطة: ${v.sender}</div>
+                    <div class="video-meta">
+                        <div class="nano-hashtag">#NANO_TECH #SHADOW_PRO #2026</div>
+                        <div class="text-[9px] text-white/40 mt-1 uppercase tracking-widest">${v.sender}</div>
                     </div>
                 `;
-                feed.appendChild(section);
+                feed.appendChild(item);
 
-                const card = document.createElement('div');
-                card.className = 'admin-card p-2';
-                card.innerHTML = `
-                    <video src="${v.url}" class="h-24 w-full object-cover rounded mb-2" muted></video>
-                    <button onclick="del('${id}')" class="w-full bg-orange-600 text-[10px] py-2 rounded font-black">حذف</button>
+                adminList.innerHTML += `
+                    <div class="bg-white/5 p-2 rounded-xl border border-orange-900/30">
+                        <video src="${v.url}" class="h-24 w-full object-cover rounded-lg mb-2" muted></video>
+                        <button onclick="del('${id}')" class="w-full py-1 text-[10px] font-black bg-orange-600/20 text-orange-500 rounded-lg">REMOVE</button>
+                    </div>
                 `;
-                adminList.appendChild(card);
             });
             initObs();
         });
 
-        function updateProgress(video) {
-            const rect = video.parentElement.getBoundingClientRect();
-            if (Math.abs(rect.top) < 10) {
-                const bar = document.getElementById('video-progress-bar');
-                document.getElementById('video-progress-bar').style.width = (video.currentTime / video.duration) * 100 + "%";
-            }
+        function trackProg(v) {
+            const rect = v.parentElement.getBoundingClientRect();
+            if (Math.abs(rect.top) < 10) document.getElementById('nano-progress').style.width = (v.currentTime/v.duration)*100 + "%";
         }
 
-        function toggleMute(e, id) {
+        function muteVid(e, id) {
             e.stopPropagation();
-            const video = e.target.closest('.video-scroll-item').querySelector('video');
-            const icon = e.currentTarget.querySelector('i');
-            video.muted = !video.muted;
-            icon.className = video.muted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
-            e.currentTarget.classList.toggle('active-orange', !video.muted);
+            const v = e.target.closest('.video-scroll-item').querySelector('video');
+            v.muted = !v.muted;
+            e.currentTarget.innerHTML = v.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>';
         }
 
         let lastT = 0;
-        function handleVideo(e, id) {
+        function handleVid(e, id) {
             const now = Date.now();
             if(now - lastT < 300) {
                 like(id);
-                const h = document.createElement('i'); h.className = 'fas fa-heart heart-pop';
+                const h = document.createElement('i'); h.className = 'fas fa-heart heart-nano';
                 h.style.left = e.clientX + 'px'; h.style.top = e.clientY + 'px';
                 document.body.appendChild(h); setTimeout(() => h.remove(), 800);
             } else { e.target.paused ? e.target.play() : e.target.pause(); }
@@ -187,28 +176,40 @@
         }
 
         function like(id) { db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); }
-        function del(id) { if(confirm('حذف؟')) db.ref(`videos/${id}`).remove(); }
+        function del(id) { if(confirm('حذف نهائي؟')) db.ref(`videos/${id}`).remove(); }
+        function toggleChat() { const m = document.getElementById('chat-modal'); m.style.display = m.style.display === 'block' ? 'none' : 'block'; }
         function toggleAdmin() {
-            const p = document.getElementById('admin-panel');
-            p.style.display = (p.style.display === 'none' || p.style.display === '') ? 'block' : 'none';
+            if(MY_ID.includes("GHOST")) {
+                const p = document.getElementById('admin-panel');
+                p.style.display = p.style.display === 'block' ? 'none' : 'block';
+            } else alert("الوصول للمسؤول فقط");
         }
+
+        function sendMsg() {
+            const i = document.getElementById('chat-msg');
+            if(i.value) { db.ref('global_chat').push({ u: MY_ID, t: i.value }); i.value = ''; }
+        }
+
+        db.ref('global_chat').limitToLast(15).on('value', s => {
+            const box = document.getElementById('chat-content'); box.innerHTML = '';
+            s.forEach(c => { const m = c.val(); box.innerHTML += `<div><b class="text-orange-500">${m.u}:</b> <span class="text-gray-300">${m.t}</span></div>`; });
+            box.scrollTop = box.scrollHeight;
+        });
 
         function initObs() {
             const obs = new IntersectionObserver((es) => {
                 es.forEach(e => {
                     const v = e.target.querySelector('video');
-                    if(e.isIntersecting) { v.play().catch(()=>{}); } else { v.pause(); v.currentTime = 0; }
+                    if(e.isIntersecting) v.play().catch(()=>{}); else { v.pause(); v.currentTime = 0; }
                 });
             }, { threshold: 0.7 });
             document.querySelectorAll('.video-scroll-item').forEach(i => obs.observe(i));
         }
 
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').textContent = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0') + ":" + now.getSeconds().toString().padStart(2, '0');
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+        setInterval(() => {
+            const d = new Date();
+            document.getElementById('nano-clock').textContent = d.getHours().toString().padStart(2,'0')+":"+d.getMinutes().toString().padStart(2,'0')+":"+d.getSeconds().toString().padStart(2,'0');
+        }, 1000);
     </script>
 </body>
 </html>
