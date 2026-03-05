@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHΔDØW | GENESIS CLOCK</title>
+    <title>SHΔDØW | GENESIS PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -11,37 +11,28 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;900&family=Cairo:wght@400;700&display=swap');
-        
         :root { --neon-color: #00f3ff; }
         body, html { margin: 0; padding: 0; height: 100%; background: #000; color: #fff; overflow: hidden; font-family: 'Cairo', sans-serif; transition: background 0.5s ease; }
-        
         .scroll-engine { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scrollbar-width: none; }
         .scroll-engine::-webkit-scrollbar { display: none; }
-        
         .video-segment { height: 100vh; width: 100vw; scroll-snap-align: start; position: relative; background: #000; overflow: hidden; }
         video { width: 100%; height: 100%; object-fit: cover; }
-
-        /* العلامة المائية الصغيرة الجديدة */
         .micro-watermark { position: absolute; top: 110px; right: 20px; font-family: 'Orbitron'; font-size: 10px; color: rgba(255, 255, 255, 0.2); pointer-events: none; z-index: 10; letter-spacing: 2px; border: 1px solid rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px; }
-
         .glass-ui { background: rgba(0,0,0,0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
-        
-        /* الساعة الرقمية في الأعلى بدلاً من Live */
         .digital-clock { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: 900; color: var(--neon-color); text-shadow: 0 0 15px var(--neon-color); letter-spacing: 1px; }
-
         .center-side-controls { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 25px; z-index: 100; align-items: center; }
         .control-btn { width: 50px; height: 50px; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
-
         .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; height: 70px; border-radius: 25px; display: flex; justify-content: space-around; align-items: center; z-index: 500; border: 1px solid var(--neon-color); }
         .upload-main { width: 55px; height: 55px; background: var(--neon-color); color: #000; border-radius: 20px; display: flex; align-items: center; justify-content: center; transform: translateY(-10px); box-shadow: 0 0 20px var(--neon-color); }
-
         #admin-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 1000; padding: 20px; overflow-y: auto; }
         .admin-video-card { background: #111; border-radius: 15px; overflow: hidden; border: 1px solid #333; position: relative; height: 180px; }
         
-        #chat-overlay { display: none; position: fixed; inset: 0; z-index: 1100; background: rgba(0,0,0,0.95); flex-direction: column; }
+        /* تأثير القلب عند النقر المزدوج */
+        .heart-animation { position: absolute; font-size: 80px; color: var(--neon-color); pointer-events: none; z-index: 1000; animation: heartFade 0.8s ease-out forwards; text-shadow: 0 0 20px var(--neon-color); }
+        @keyframes heartFade { 0% { transform: scale(0) rotate(-15deg); opacity: 0; } 50% { transform: scale(1.2) rotate(10deg); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
     </style>
 </head>
-<body id="main-body">
+<body>
 
     <header class="fixed top-0 w-full z-[200] glass-ui p-4 flex justify-between items-center border-b border-white/5">
         <div class="digital-clock" id="clock-display">00:00:00</div>
@@ -66,18 +57,6 @@
         <div id="admin-grid" class="grid grid-cols-2 gap-4 pb-24"></div>
     </div>
 
-    <div id="chat-overlay">
-        <div class="p-5 border-b border-white/10 flex justify-between items-center">
-            <span style="color: var(--neon-color)">ENCRYPTED_STREAM</span>
-            <i class="fas fa-times" onclick="toggleChat()"></i>
-        </div>
-        <div id="chat-box" class="flex-1 p-5 overflow-y-auto space-y-3"></div>
-        <div class="p-6 pb-10 flex gap-2">
-            <input type="text" id="msg-input" class="flex-1 bg-white/5 p-4 rounded-2xl border border-white/10" placeholder="Type message...">
-            <button onclick="sendChat()" class="p-2"><i class="fas fa-paper-plane text-xl" style="color: var(--neon-color)"></i></button>
-        </div>
-    </div>
-
     <script>
         const SHADOW_ID = localStorage.getItem('shadow_uid') || 'GHOST_' + Math.random().toString(36).substr(2, 4).toUpperCase();
         localStorage.setItem('shadow_uid', SHADOW_ID);
@@ -86,94 +65,91 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // الروابط الإعلانية الجديدة
         const AD_LINKS = [
             "https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c",
             "https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e"
         ];
         let adCounter = 0;
-
-        function openAd() { 
-            window.open(AD_LINKS[adCounter], '_blank'); 
-            adCounter = (adCounter + 1) % AD_LINKS.length; 
-        }
+        function openAd() { window.open(AD_LINKS[adCounter], '_blank'); adCounter = (adCounter + 1) % AD_LINKS.length; }
 
         function updateClock() {
             const now = new Date();
-            const h = String(now.getHours()).padStart(2, '0');
-            const m = String(now.getMinutes()).padStart(2, '0');
-            const s = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('clock-display').textContent = `${h}:${m}:${s}`;
+            document.getElementById('clock-display').textContent = now.getHours().toString().padStart(2,'0')+":"+now.getMinutes().toString().padStart(2,'0')+":"+now.getSeconds().toString().padStart(2,'0');
         }
         setInterval(updateClock, 1000);
-        updateClock();
 
         db.ref('videos').on('value', (snapshot) => {
             const container = document.getElementById('video-stack');
             const adminGrid = document.getElementById('admin-grid');
             const data = snapshot.val();
             if(!data) return;
-            
-            container.innerHTML = '';
-            adminGrid.innerHTML = '';
+            container.innerHTML = ''; adminGrid.innerHTML = '';
             
             Object.keys(data).reverse().forEach(id => {
                 const vid = data[id];
-                
                 const section = document.createElement('section');
                 section.className = 'video-segment';
                 section.innerHTML = `
                     <div class="micro-watermark">GENESIS</div>
-                    <video loop playsinline src="${vid.url}" onclick="openAd()"></video>
+                    <video loop playsinline src="${vid.url}" id="vid-${id}" onclick="handleVideoClick(event, '${id}')"></video>
                     <div class="center-side-controls">
                         <div class="control-btn" onclick="likeWithAd('${id}')">
                             <i class="fas fa-heart ${vid.likedBy && vid.likedBy[SHADOW_ID] ? 'text-red-500' : ''}"></i>
                             <span class="text-[10px] mt-1">${vid.likes || 0}</span>
                         </div>
-                        <div class="control-btn" onclick="muteWithAd(this)">
-                            <i class="fas fa-volume-up"></i>
-                        </div>
-                        <div class="control-btn" onclick="shareWithAd()">
-                            <i class="fas fa-paper-plane"></i>
-                        </div>
+                        <div class="control-btn" onclick="muteWithAd(this)"><i class="fas fa-volume-up"></i></div>
+                        <div class="control-btn" onclick="shareWithAd()"><i class="fas fa-paper-plane"></i></div>
                     </div>
                 `;
                 container.appendChild(section);
 
-                const card = document.createElement('div');
-                card.className = 'admin-video-card';
-                card.innerHTML = `
-                    <video src="${vid.url}" class="w-full h-full object-cover" muted></video>
-                    <div class="absolute inset-0 bg-black/60 flex flex-col items-center justify-center p-2 text-center">
-                        <button onclick="deleteVid('${id}')" class="bg-red-600 px-4 py-1 rounded-full text-[10px] font-bold">REMOVE</button>
+                adminGrid.innerHTML += `
+                    <div class="admin-video-card">
+                        <video src="${vid.url}" class="w-full h-full object-cover" muted></video>
+                        <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
+                            <button onclick="deleteVid('${id}')" class="bg-red-600 px-4 py-1 rounded-full text-[10px] font-bold">REMOVE</button>
+                        </div>
                     </div>
                 `;
-                adminGrid.appendChild(card);
             });
             initScroll();
         });
 
+        // التعامل مع النقر المزدوج (بدون إعلانات) والنقر العادي
+        let lastClick = 0;
+        function handleVideoClick(e, id) {
+            const now = Date.now();
+            if (now - lastClick < 300) {
+                // نادٍ وظيفة الإعجاب بدون إعلان
+                db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1);
+                showHeartEffect(e);
+            } else {
+                const v = e.target;
+                v.paused ? v.play() : v.pause();
+            }
+            lastClick = now;
+        }
+
+        function showHeartEffect(e) {
+            const h = document.createElement('i');
+            h.className = 'fas fa-heart heart-animation';
+            h.style.left = e.clientX - 40 + 'px';
+            h.style.top = e.clientY - 40 + 'px';
+            document.body.appendChild(h);
+            setTimeout(() => h.remove(), 800);
+        }
+
         function likeWithAd(id) { openAd(); db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); }
         function muteWithAd(btn) { openAd(); const v = btn.closest('.video-segment').querySelector('video'); v.muted = !v.muted; btn.innerHTML = v.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>'; }
         function shareWithAd() { openAd(); navigator.share({ url: window.location.href }); }
-
         function toggleAdmin() { const el = document.getElementById('admin-overlay'); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
-        function deleteVid(id) { if(confirm('حذف السجل؟')) db.ref(`videos/${id}`).remove(); }
+        function deleteVid(id) { if(confirm('حذف؟')) db.ref(`videos/${id}`).remove(); }
 
         const widget = cloudinary.createUploadWidget({ cloudName: "dssk5tabb", uploadPreset: "bjebvo5p" }, (err, res) => {
-            if (!err && res.event === "success") {
-                db.ref('videos/').push({ url: res.info.secure_url, sender: SHADOW_ID, likes: 0, timestamp: Date.now() });
-            }
+            if (!err && res.event === "success") { db.ref('videos/').push({ url: res.info.secure_url, sender: SHADOW_ID, likes: 0, timestamp: Date.now() }); }
         });
         document.getElementById("upload-trigger").onclick = () => { openAd(); widget.open(); };
-
-        function toggleChat() { const c = document.getElementById('chat-overlay'); c.style.display = c.style.display === 'flex' ? 'none' : 'flex'; }
-        function sendChat() { const i = document.getElementById('msg-input'); if(i.value){ db.ref('global_chat').push({u:SHADOW_ID, t:i.value}); i.value=''; } }
-        
-        db.ref('global_chat').limitToLast(15).on('value', s => {
-            const b = document.getElementById('chat-box'); b.innerHTML = '';
-            s.forEach(m => { const d = m.val(); b.innerHTML += `<div class="bg-white/5 p-3 rounded-xl border border-white/5"><b class="text-[10px] block" style="color: var(--neon-color)">${d.u}</b><span class="text-sm">${d.t}</span></div>`; });
-            b.scrollTop = b.scrollHeight;
-        });
 
         function initScroll() {
             const colors = ['#00f3ff', '#ff00ff', '#00ffaa', '#ffff00', '#ff4d00'];
@@ -182,8 +158,7 @@
                     const v = e.target.querySelector('video');
                     if(e.isIntersecting) {
                         v.play().catch(()=>{});
-                        const newColor = colors[Math.floor(Math.random() * colors.length)];
-                        document.documentElement.style.setProperty('--neon-color', newColor);
+                        document.documentElement.style.setProperty('--neon-color', colors[Math.floor(Math.random() * colors.length)]);
                     } else { if(v) v.pause(); }
                 });
             }, { threshold: 0.6 });
