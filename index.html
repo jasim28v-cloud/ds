@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SHΔDØW | GENESIS PRO</title>
+    <title>SHΔDØW | GENESIS ULTIMATE</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://upload-widget.cloudinary.com/global/all.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -21,13 +21,11 @@
         .glass-ui { background: rgba(0,0,0,0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
         .digital-clock { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: 900; color: var(--neon-color); text-shadow: 0 0 15px var(--neon-color); letter-spacing: 1px; }
         .center-side-controls { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 25px; z-index: 100; align-items: center; }
-        .control-btn { width: 50px; height: 50px; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
+        .control-btn { width: 50px; height: 50px; border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; cursor: pointer; }
         .bottom-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; height: 70px; border-radius: 25px; display: flex; justify-content: space-around; align-items: center; z-index: 500; border: 1px solid var(--neon-color); }
-        .upload-main { width: 55px; height: 55px; background: var(--neon-color); color: #000; border-radius: 20px; display: flex; align-items: center; justify-content: center; transform: translateY(-10px); box-shadow: 0 0 20px var(--neon-color); }
+        .upload-main { width: 55px; height: 55px; background: var(--neon-color); color: #000; border-radius: 20px; display: flex; align-items: center; justify-content: center; transform: translateY(-10px); box-shadow: 0 0 20px var(--neon-color); cursor: pointer; }
         #admin-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 1000; padding: 20px; overflow-y: auto; }
         .admin-video-card { background: #111; border-radius: 15px; overflow: hidden; border: 1px solid #333; position: relative; height: 180px; }
-        
-        /* تأثير القلب عند النقر المزدوج */
         .heart-animation { position: absolute; font-size: 80px; color: var(--neon-color); pointer-events: none; z-index: 1000; animation: heartFade 0.8s ease-out forwards; text-shadow: 0 0 20px var(--neon-color); }
         @keyframes heartFade { 0% { transform: scale(0) rotate(-15deg); opacity: 0; } 50% { transform: scale(1.2) rotate(10deg); opacity: 1; } 100% { transform: scale(1.5); opacity: 0; } }
     </style>
@@ -42,17 +40,16 @@
     <main class="scroll-engine" id="video-stack"></main>
 
     <nav class="bottom-nav glass-ui">
-        <div class="nav-item" onclick="location.reload()"><i class="fas fa-home opacity-50"></i></div>
-        <div class="nav-item" onclick="toggleChat()"><i class="fas fa-comment-dots opacity-50"></i></div>
-        <div id="upload-trigger" class="upload-main"><i class="fas fa-plus"></i></div>
-        <div class="nav-item" onclick="toggleAdmin()"><i class="fas fa-user-shield opacity-50"></i></div>
-        <div class="nav-item" onclick="shareWithAd()"><i class="fas fa-share-alt opacity-50"></i></div>
+        <div class="nav-item cursor-pointer" onclick="location.reload()"><i class="fas fa-home opacity-50 text-xl"></i></div>
+        <div class="nav-item cursor-pointer" onclick="toggleAdmin()"><i class="fas fa-user-shield opacity-50 text-xl"></i></div>
+        <div id="upload-trigger" class="upload-main"><i class="fas fa-plus text-xl"></i></div>
+        <div class="nav-item cursor-pointer" onclick="shareWithAd()"><i class="fas fa-share-alt opacity-50 text-xl"></i></div>
     </nav>
 
     <div id="admin-overlay">
         <div class="flex justify-between items-center mb-6 sticky top-0 bg-black py-4 z-50">
-            <h2 style="color: var(--neon-color)" class="font-[Orbitron]">SYSTEM_MANAGER</h2>
-            <i class="fas fa-times text-2xl" onclick="toggleAdmin()"></i>
+            <h2 style="color: var(--neon-color)" class="font-[Orbitron]">CORE_MANAGER</h2>
+            <i class="fas fa-times text-2xl cursor-pointer" onclick="toggleAdmin()"></i>
         </div>
         <div id="admin-grid" class="grid grid-cols-2 gap-4 pb-24"></div>
     </div>
@@ -65,7 +62,6 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // الروابط الإعلانية الجديدة
         const AD_LINKS = [
             "https://www.effectivegatecpm.com/bxwxuk2f39?key=566216691dc8b76a740840e94f68f44c",
             "https://www.effectivegatecpm.com/k60w64w4gk?key=564f3d8cc4ac85949f218179b742495e"
@@ -78,6 +74,7 @@
             document.getElementById('clock-display').textContent = now.getHours().toString().padStart(2,'0')+":"+now.getMinutes().toString().padStart(2,'0')+":"+now.getSeconds().toString().padStart(2,'0');
         }
         setInterval(updateClock, 1000);
+        updateClock();
 
         db.ref('videos').on('value', (snapshot) => {
             const container = document.getElementById('video-stack');
@@ -92,7 +89,7 @@
                 section.className = 'video-segment';
                 section.innerHTML = `
                     <div class="micro-watermark">GENESIS</div>
-                    <video loop playsinline src="${vid.url}" id="vid-${id}" onclick="handleVideoClick(event, '${id}')"></video>
+                    <video loop playsinline src="${vid.url}" onclick="handleVideoClick(event, '${id}')"></video>
                     <div class="center-side-controls">
                         <div class="control-btn" onclick="likeWithAd('${id}')">
                             <i class="fas fa-heart ${vid.likedBy && vid.likedBy[SHADOW_ID] ? 'text-red-500' : ''}"></i>
@@ -104,29 +101,29 @@
                 `;
                 container.appendChild(section);
 
-                adminGrid.innerHTML += `
-                    <div class="admin-video-card">
-                        <video src="${vid.url}" class="w-full h-full object-cover" muted></video>
-                        <div class="absolute inset-0 bg-black/60 flex items-center justify-center">
-                            <button onclick="deleteVid('${id}')" class="bg-red-600 px-4 py-1 rounded-full text-[10px] font-bold">REMOVE</button>
-                        </div>
+                const card = document.createElement('div');
+                card.className = 'admin-video-card';
+                card.innerHTML = `
+                    <video src="${vid.url}" class="w-full h-full object-cover" muted></video>
+                    <div class="absolute inset-0 bg-black/60 flex items-center justify-center p-2">
+                        <button onclick="deleteVid('${id}')" class="bg-red-600 text-white px-4 py-1 rounded-full text-[10px] font-bold">DELETE</button>
                     </div>
                 `;
+                adminGrid.appendChild(card);
             });
             initScroll();
         });
 
-        // التعامل مع النقر المزدوج (بدون إعلانات) والنقر العادي
         let lastClick = 0;
         function handleVideoClick(e, id) {
             const now = Date.now();
             if (now - lastClick < 300) {
-                // نادٍ وظيفة الإعجاب بدون إعلان
                 db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1);
+                db.ref(`videos/${id}/likedBy/${SHADOW_ID}`).set(true);
                 showHeartEffect(e);
             } else {
                 const v = e.target;
-                v.paused ? v.play() : v.pause();
+                v.paused ? v.play().catch(()=>{}) : v.pause();
             }
             lastClick = now;
         }
@@ -134,22 +131,22 @@
         function showHeartEffect(e) {
             const h = document.createElement('i');
             h.className = 'fas fa-heart heart-animation';
-            h.style.left = e.clientX - 40 + 'px';
-            h.style.top = e.clientY - 40 + 'px';
+            h.style.left = (e.clientX || e.pageX) - 40 + 'px';
+            h.style.top = (e.clientY || e.pageY) - 40 + 'px';
             document.body.appendChild(h);
             setTimeout(() => h.remove(), 800);
         }
 
         function likeWithAd(id) { openAd(); db.ref(`videos/${id}/likes`).transaction(l => (l || 0) + 1); }
         function muteWithAd(btn) { openAd(); const v = btn.closest('.video-segment').querySelector('video'); v.muted = !v.muted; btn.innerHTML = v.muted ? '<i class="fas fa-volume-mute"></i>' : '<i class="fas fa-volume-up"></i>'; }
-        function shareWithAd() { openAd(); navigator.share({ url: window.location.href }); }
+        function shareWithAd() { openAd(); navigator.share({ url: window.location.href }).catch(()=>{}); }
         function toggleAdmin() { const el = document.getElementById('admin-overlay'); el.style.display = el.style.display === 'block' ? 'none' : 'block'; }
-        function deleteVid(id) { if(confirm('حذف؟')) db.ref(`videos/${id}`).remove(); }
+        function deleteVid(id) { if(confirm('حذف هذا الفيديو نهائياً؟')) db.ref(`videos/${id}`).remove(); }
 
         const widget = cloudinary.createUploadWidget({ cloudName: "dssk5tabb", uploadPreset: "bjebvo5p" }, (err, res) => {
             if (!err && res.event === "success") { db.ref('videos/').push({ url: res.info.secure_url, sender: SHADOW_ID, likes: 0, timestamp: Date.now() }); }
         });
-        document.getElementById("upload-trigger").onclick = () => { openAd(); widget.open(); };
+        document.getElementById("upload-trigger").onclick = () => { widget.open(); };
 
         function initScroll() {
             const colors = ['#00f3ff', '#ff00ff', '#00ffaa', '#ffff00', '#ff4d00'];
@@ -157,7 +154,7 @@
                 entries.forEach(e => {
                     const v = e.target.querySelector('video');
                     if(e.isIntersecting) {
-                        v.play().catch(()=>{});
+                        if(v) v.play().catch(()=>{});
                         document.documentElement.style.setProperty('--neon-color', colors[Math.floor(Math.random() * colors.length)]);
                     } else { if(v) v.pause(); }
                 });
